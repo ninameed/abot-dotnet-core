@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Net;
+using System.Net.Http;
 using AngleSharp;
 using AngleSharp.Dom.Html;
 using AngleSharp.Parser.Html;
@@ -41,11 +42,13 @@ namespace Abot.Poco
         /// Web request sent to the server
         /// </summary>
         public HttpWebRequest HttpWebRequest { get; set; }
+        public HttpRequestMessage HttpRequestMessage { get; set; }
 
         /// <summary>
         /// Web response from the server. NOTE: The Close() method has been called before setting this property.
         /// </summary>
         public HttpWebResponseWrapper HttpWebResponse { get; set; }
+        public HttpResponseMessage HttpResponseMessage { get; set; }
 
         /// <summary>
         /// The web exception that occurred during the crawl

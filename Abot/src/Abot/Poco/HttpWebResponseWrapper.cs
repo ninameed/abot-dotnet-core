@@ -4,6 +4,7 @@ using System.Collections.Specialized;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Net.Http;
 using System.Text;
 
 namespace Abot.Poco
@@ -16,7 +17,8 @@ namespace Abot.Poco
     /// </remarks>
     public class HttpWebResponseWrapper
     {
-        private readonly HttpWebResponse _internalResponse;
+        //private readonly HttpWebResponse _internalResponse;
+        private readonly HttpResponseMessage _internalResponse;
         private readonly byte[] _content;
         private readonly Lazy<Stream> _contentStream;
         protected static bool? IsMutuallyAuthenticatedImplemented { get; set; }
@@ -24,13 +26,13 @@ namespace Abot.Poco
         #region Constructors
 
         /// <summary>Constructs a response based on the received system http response.</summary>
-        public HttpWebResponseWrapper(HttpWebResponse response)
+        public HttpWebResponseWrapper(HttpResponseMessage response)
         {
             _internalResponse = response;
 
             if (response == null)
                 return;
-
+            //http://stackoverflow.com/questions/13318102/struggling-trying-to-get-cookie-out-of-response-with-httpclient-in-net-4-5
             StatusCode = response.StatusCode;
             ContentType = response.ContentType;
             ContentLength = response.ContentLength;
