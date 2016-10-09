@@ -11,13 +11,13 @@ namespace Abot.Poco
 {
     public class CrawledPage : PageToCrawl
     {
-        //ILog _logger = LogManager.GetLogger("AbotLogger");
-        ILogger _logger { get; } = ApplicationLogging.CreateLogger<Controller>();
-        // ...
+        //https://msdn.microsoft.com/en-us/magazine/mt694089.aspx
+        static ILogger _logger { get; } = new LoggerFactory().CreateLogger<CrawledPage>();
+
         HtmlParser _angleSharpHtmlParser;
 
-        Lazy<HtmlDocument> _htmlDocument;
-        Lazy<IHtmlDocument> _angleSharpHtmlDocument;
+        readonly Lazy<HtmlDocument> _htmlDocument;
+        readonly Lazy<IHtmlDocument> _angleSharpHtmlDocument;
 
         public CrawledPage(Uri uri)
             : base(uri)
