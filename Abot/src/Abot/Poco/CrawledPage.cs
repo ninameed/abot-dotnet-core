@@ -8,12 +8,15 @@ using System.Net.Http;
 using AngleSharp;
 using AngleSharp.Dom.Html;
 using AngleSharp.Parser.Html;
+using Microsoft.Extensions.Logging;
 
 namespace Abot.Poco
 {
     public class CrawledPage : PageToCrawl
     {
-        ILog _logger = LogManager.GetLogger("AbotLogger");
+        //ILog _logger = LogManager.GetLogger("AbotLogger");
+        ILogger _logger { get; } = ApplicationLogging.CreateLogger<Controller>();
+        // ...
         HtmlParser _angleSharpHtmlParser;
 
         Lazy<HtmlDocument> _htmlDocument;
@@ -31,12 +34,12 @@ namespace Abot.Poco
         /// <summary>
         /// Lazy loaded Html Agility Pack (http://htmlagilitypack.codeplex.com/) document that can be used to retrieve/modify html elements on the crawled page.
         /// </summary>
-        public HtmlDocument HtmlDocument { get { return _htmlDocument.Value; } }
+        public HtmlDocument HtmlDocument => _htmlDocument.Value;
 
         /// <summary>
         /// Lazy loaded AngleSharp IHtmlDocument (https://github.com/AngleSharp/AngleSharp) that can be used to retrieve/modify html elements on the crawled page.
         /// </summary>
-        public IHtmlDocument AngleSharpHtmlDocument { get { return _angleSharpHtmlDocument.Value; } }
+        public IHtmlDocument AngleSharpHtmlDocument => _angleSharpHtmlDocument.Value;
 
         /// <summary>
         /// Web request sent to the server
@@ -101,11 +104,7 @@ namespace Abot.Poco
         /// <summary>
         /// Time it took from RequestStarted to RequestCompleted in milliseconds
         /// </summary>
-        public double Elapsed {
-            get {
-                return (RequestCompleted - RequestStarted).TotalMilliseconds;
-            }
-        }
+        public double Elapsed => (RequestCompleted - RequestStarted).TotalMilliseconds;
 
         private HtmlDocument InitializeHtmlAgilityPackDocument()
         {
@@ -119,9 +118,7 @@ namespace Abot.Poco
             catch (Exception e)
             {
                 hapDoc.LoadHtml("");
-
-                _logger.ErrorFormat("Error occurred while loading HtmlAgilityPack object for Url [{0}]", Uri);
-                _logger.Error(e);
+                _logger.LogError($"Error occurred while loading HtmlAgilityPack object for Url [{Uri}]", e);
             }
             return hapDoc;
         }
@@ -140,8 +137,7 @@ namespace Abot.Poco
             {
                 document = _angleSharpHtmlParser.Parse("");
 
-                _logger.ErrorFormat("Error occurred while loading AngularSharp object for Url [{0}]", Uri);
-                _logger.Error(e);
+                _logger.LogError($"Error occurred while loading AngularSharp object for Url [{Uri}]", e);
             }
 
             return document;
