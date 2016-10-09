@@ -1,11 +1,8 @@
 ﻿using HtmlAgilityPack;
-using log4net;
 using System;
 using System.Collections.Generic;
-using System.Collections.Specialized;
 using System.Net;
 using System.Net.Http;
-using AngleSharp;
 using AngleSharp.Dom.Html;
 using AngleSharp.Parser.Html;
 using Microsoft.Extensions.Logging;
