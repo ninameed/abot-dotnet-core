@@ -4,25 +4,27 @@ using log4net;
 using System;
 using System.IO;
 using System.Net;
+using System.Net.Http;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 
 namespace Abot.Core
 {
     public interface IWebContentExtractor : IDisposable
     {
-        PageContent GetContent(WebResponse response);
+        Task<PageContent> GetContent(HttpResponseMessage httpResponseMessage);
     }
 
     public class WebContentExtractor : IWebContentExtractor
     {
         static ILog _logger = LogManager.GetLogger("AbotLogger");
 
-        public virtual PageContent GetContent(WebResponse response)
+        public virtual async Task<PageContent> GetContent(HttpResponseMessage httpResponseMessage)
         {
-            using (MemoryStream memoryStream = GetRawData(response))
+            using (MemoryStream memoryStream = await GetRawData(httpResponseMessage))
             {
-                String charset = GetCharsetFromHeaders(response);
+                String charset = GetCharsetFromHeaders(httpResponseMessage);
 
                 if (charset == null) {
                     memoryStream.Seek(0, SeekOrigin.Begin);
@@ -52,17 +54,9 @@ namespace Abot.Core
             }
         }
 
-        protected virtual string GetCharsetFromHeaders(WebResponse webResponse)
+        protected virtual string GetCharsetFromHeaders(HttpResponseMessage httpResponseMessage)
         {
-            string charset = null;
-            String ctype = webResponse.Headers["content-type"];
-            if (ctype != null)
-            {
-                int ind = ctype.IndexOf("charset=");
-                if (ind != -1)
-                    charset = ctype.Substring(ind + 8);
-            }
-            return charset;
+            return httpResponseMessage.Content.Headers.ContentType.CharSet;
         }
 
         protected virtual string GetCharsetFromBody(string body)
@@ -106,13 +100,13 @@ namespace Abot.Core
             return charset;
         }
 
-        private MemoryStream GetRawData(WebResponse webResponse)
+        private async Task<MemoryStream> GetRawData(HttpResponseMessage responseMessage)
         {
             MemoryStream rawData = new MemoryStream();
 
             try
             {
-                using (Stream rs = webResponse.GetResponseStream())
+                using (Stream rs = await responseMessage.Content.ReadAsStreamAsync())
                 {
                     byte[] buffer = new byte[1024];
                     int read = rs.Read(buffer, 0, buffer.Length);
@@ -125,7 +119,7 @@ namespace Abot.Core
             }
             catch (Exception e)
             {
-                _logger.WarnFormat("Error occurred while downloading content of url {0}", webResponse.ResponseUri.AbsoluteUri);
+                _logger.WarnFormat("Error occurred while downloading content of url {0}", responseMessage.RequestMessage.RequestUri);
                 _logger.Warn(e);
             }
 
