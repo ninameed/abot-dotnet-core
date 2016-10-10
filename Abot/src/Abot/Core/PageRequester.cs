@@ -1,14 +1,9 @@
 ﻿using Abot.Poco;
-using log4net;
 using System;
-using System.CodeDom;
-using System.IO;
-using System.Linq;
 using System.Net;
 using System.Net.Http;
-using System.Reflection;
 using System.Threading.Tasks;
-using log4net.Core;
+using Microsoft.Extensions.Logging;
 
 namespace Abot.Core
 {
@@ -27,11 +22,13 @@ namespace Abot.Core
 
     public class PageRequester : IPageRequester
     {
-        static ILog _logger = LogManager.GetLogger("AbotLogger");
+        static ILogger _logger = new LoggerFactory().CreateLogger<PageRequester>();
 
         protected CrawlConfiguration _config;
         protected IWebContentExtractor _extractor;
         protected CookieContainer _cookieContainer = new CookieContainer();
+        protected HttpClientHandler _httpClientHandler;
+        protected HttpClient _httpClient;
 
         public PageRequester(CrawlConfiguration config)
             : this(config, null)
@@ -42,7 +39,7 @@ namespace Abot.Core
         public PageRequester(CrawlConfiguration config, IWebContentExtractor contentExtractor)
         {
             if (config == null)
-                throw new ArgumentNullException("config");
+                throw new ArgumentNullException(nameof(config));
 
             _config = config;
 
@@ -56,6 +53,9 @@ namespace Abot.Core
             //        (sender, certificate, chain, sslPolicyErrors) => true;
 
             _extractor = contentExtractor ?? new WebContentExtractor();
+
+            _httpClientHandler = BuildHttpClientHandler();
+            _httpClient = BuildHttpClient(_httpClientHandler);
         }
 
         /// <summary>
@@ -72,27 +72,14 @@ namespace Abot.Core
         public virtual async Task<CrawledPage> MakeRequestAsync(Uri uri, Func<CrawledPage, CrawlDecision> shouldDownloadContent)
         {
             if (uri == null)
-                throw new ArgumentNullException("uri");
+                throw new ArgumentNullException(nameof(uri));
 
-            CrawledPage crawledPage = new CrawledPage(uri);
-
-            //https://blogs.msdn.microsoft.com/henrikn/2012/08/07/httpclient-httpclienthandler-and-webrequesthandler-explained/
-            //TODO Reuse HttpClient http://stackoverflow.com/questions/15705092/do-httpclient-and-httpclienthandler-have-to-be-disposed
-            //AND http://aspnetmonsters.com/2016/08/2016-08-27-httpclientwrong/
-
-            HttpClientHandler httpClientHandler = null;
-            HttpClient httpClient = null;
+            var crawledPage = new CrawledPage(uri);
             HttpResponseMessage httpResponseMessage = null;
-            Stream httpResponseStream = null;
             try
             {
-                httpClientHandler = BuildHttpClientHandler();
-                httpClient = BuildHttpClient(httpClientHandler);
                 crawledPage.RequestStarted = DateTime.Now;
-
-                httpResponseMessage = await httpClient.GetAsync(uri);
-                //ProcessResponse(httpResponseMessage, httpClientHandler);
-                //httpResponseStream = await httpClient.GetStreamAsync(uri);
+                httpResponseMessage = await _httpClient.GetAsync(uri);
             }
             //catch (HttpRequestException hre)
             //{
@@ -105,13 +92,11 @@ namespace Abot.Core
             catch (WebException e)
             {
                 crawledPage.WebException = e;
-                _logger.DebugFormat("Error occurred requesting url [{0}]", uri.AbsoluteUri);
-                _logger.Debug(e);
+                _logger.LogDebug($"Error occurred requesting url [{uri.AbsoluteUri}]", e);
             }
             catch (Exception e)
             {
-                _logger.DebugFormat("Error occurred requesting url [{0}]", uri.AbsoluteUri);
-                _logger.Debug(e);
+                _logger.LogDebug($"Error occurred requesting url [{uri.AbsoluteUri}]", e);
             }
             finally
             {
@@ -122,7 +107,7 @@ namespace Abot.Core
                     if (httpResponseMessage != null)
                     {
                         crawledPage.HttpWebResponse = new HttpWebResponseWrapper(httpResponseMessage);
-                        CrawlDecision shouldDownloadContentDecision = shouldDownloadContent(crawledPage);
+                        var shouldDownloadContentDecision = shouldDownloadContent(crawledPage);
                         if (shouldDownloadContentDecision.Allow)
                         {
                             crawledPage.DownloadContentStarted = DateTime.Now;
@@ -131,7 +116,7 @@ namespace Abot.Core
                         }
                         else
                         {
-                            _logger.DebugFormat("Links on page [{0}] not crawled, [{1}]", crawledPage.Uri.AbsoluteUri, shouldDownloadContentDecision.Reason);
+                            _logger.LogDebug($"Links on page [{crawledPage.Uri.AbsoluteUri}] not crawled, [{shouldDownloadContentDecision.Reason}]");
                         }
 
                         //response.Close();//Should already be closed by _extractor but just being safe
@@ -139,15 +124,15 @@ namespace Abot.Core
                 }
                 catch (Exception e)
                 {
-                    _logger.DebugFormat("Error occurred finalizing requesting url [{0}]", uri.AbsoluteUri);
-                    _logger.Debug(e);
+                    _logger.LogDebug($"Error occurred finalizing requesting url [{uri.AbsoluteUri}]", e);
                 }
             }
 
             return crawledPage;
         }
 
-        protected virtual HttpClientHandler BuildHttpClientHandler()
+        //Do not mark as virtual, could cause issues in inheritance constructoring calling
+        private HttpClientHandler BuildHttpClientHandler()
         {
             var handler = new HttpClientHandler();
 
@@ -172,7 +157,8 @@ namespace Abot.Core
             return handler;
         }
 
-        protected virtual HttpClient BuildHttpClient(HttpClientHandler httpHandler)
+        //Do not mark as virtual, could cause issues in inheritance constructoring calling
+        private HttpClient BuildHttpClient(HttpClientHandler httpHandler)
         {
             var httpClient = new HttpClient(httpHandler);
             httpClient.DefaultRequestHeaders.TryAddWithoutValidation("Accept", "*/*");
@@ -183,22 +169,11 @@ namespace Abot.Core
 
             if (_config.IsAlwaysLogin)
             {
-                string credentials = Convert.ToBase64String(System.Text.Encoding.ASCII.GetBytes(_config.LoginUser + ":" + _config.LoginPassword));
+                var credentials = Convert.ToBase64String(System.Text.Encoding.ASCII.GetBytes(_config.LoginUser + ":" + _config.LoginPassword));
                 httpClient.DefaultRequestHeaders.TryAddWithoutValidation("Authorization",  "Basic " + credentials);
             }
             return httpClient;
         }
-
-        //protected virtual void ProcessResponse(HttpResponseMessage responseMessage, HttpClientHandler httpHandler)
-        //{
-        //    //http://stackoverflow.com/questions/13318102/struggling-trying-to-get-cookie-out-of-response-with-httpclient-in-net-4-5
-        //    //Should already be in the _cookieContainer, looks like if its not null it automatically adds them
-        //    //if (responseMessage != null && _config.IsSendingCookiesEnabled)
-        //    //{
-        //    //    CookieCollection cookies = response.Cookies;
-        //    //    _cookieContainer.Add(cookies);
-        //    //}
-        //}
 
         public void Dispose()
         {
