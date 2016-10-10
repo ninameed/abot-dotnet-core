@@ -1,4 +1,4 @@
-﻿using log4net;
+﻿using Microsoft.Extensions.Logging;
 using System;
 using System.Runtime;
 
@@ -23,13 +23,13 @@ namespace Abot.Util
     
     public class MemoryManager : IMemoryManager
     {
-        static ILog _logger = LogManager.GetLogger("AbotLogger");
+        static ILogger _logger = new LoggerFactory().CreateLogger("AbotLogger");
         IMemoryMonitor _memoryMonitor;
 
         public MemoryManager(IMemoryMonitor memoryMonitor)
         {
             if (memoryMonitor == null)
-                throw new ArgumentNullException("memoryMonitor");
+                throw new ArgumentNullException(nameof(memoryMonitor));
 
             _memoryMonitor = memoryMonitor;
         }
@@ -44,7 +44,7 @@ namespace Abot.Util
             if (sizeInMb < 1)
                 return true;
 
-            bool isAvailable = true;
+            var isAvailable = true;
 
             MemoryFailPoint _memoryFailPoint = null;
             try

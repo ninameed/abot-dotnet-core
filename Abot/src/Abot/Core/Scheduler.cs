@@ -73,7 +73,7 @@ namespace Abot.Core
         public void Add(PageToCrawl page)
         {
             if (page == null)
-                throw new ArgumentNullException("page");
+                throw new ArgumentNullException(nameof(page));
 
             if (_allowUriRecrawling || page.IsRetry)
             {
@@ -89,9 +89,9 @@ namespace Abot.Core
         public void Add(IEnumerable<PageToCrawl> pages)
         {
             if (pages == null)
-                throw new ArgumentNullException("pages");
+                throw new ArgumentNullException(nameof(pages));
 
-            foreach (PageToCrawl page in pages)
+            foreach (var page in pages)
                 Add(page);
         }
 

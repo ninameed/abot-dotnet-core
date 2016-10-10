@@ -65,11 +65,11 @@ namespace Abot.Util
         {
             // Check the arguments.
             if (occurrences <= 0)
-                throw new ArgumentOutOfRangeException("occurrences", "Number of occurrences must be a positive integer");
+                throw new ArgumentOutOfRangeException(nameof(occurrences), "Number of occurrences must be a positive integer");
             if (timeUnit != timeUnit.Duration())
-                throw new ArgumentOutOfRangeException("timeUnit", "Time unit must be a positive span of time");
+                throw new ArgumentOutOfRangeException(nameof(timeUnit), "Time unit must be a positive span of time");
             if (timeUnit >= TimeSpan.FromMilliseconds(UInt32.MaxValue))
-                throw new ArgumentOutOfRangeException("timeUnit", "Time unit must be less than 2^32 milliseconds");
+                throw new ArgumentOutOfRangeException(nameof(timeUnit), "Time unit must be less than 2^32 milliseconds");
 
             Occurrences = occurrences;
             TimeUnitMilliseconds = (int)timeUnit.TotalMilliseconds;
@@ -95,7 +95,7 @@ namespace Abot.Util
         {
             // Check the arguments.
             if (millisecondsTimeout < -1)
-                throw new ArgumentOutOfRangeException("millisecondsTimeout");
+                throw new ArgumentOutOfRangeException(nameof(millisecondsTimeout));
 
             CheckDisposed();
 
@@ -168,7 +168,7 @@ namespace Abot.Util
             // While there are exit times that are passed due still in the queue,
             // exit the semaphore and dequeue the exit time.
             int exitTime;
-            bool exitTimeValid = _exitTimes.TryPeek(out exitTime);
+            var exitTimeValid = _exitTimes.TryPeek(out exitTime);
             while (exitTimeValid)
             {
                 if (unchecked(exitTime - Environment.TickCount) > 0)

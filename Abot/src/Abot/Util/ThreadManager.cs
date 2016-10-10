@@ -1,4 +1,4 @@
-﻿using log4net;
+﻿using Microsoft.Extensions.Logging;
 using System;
 using System.Threading;
 
@@ -34,7 +34,7 @@ namespace Abot.Util
     
     public abstract class ThreadManager : IThreadManager
     {
-        protected static ILog _logger = LogManager.GetLogger("AbotLogger");
+        protected static ILogger _logger = new LoggerFactory().CreateLogger("AbotLogger");
         protected bool _abortAllCalled = false;
         protected int _numberOfRunningThreads = 0;
         protected ManualResetEvent _resetEvent = new ManualResetEvent(true);
@@ -64,7 +64,7 @@ namespace Abot.Util
         public virtual void DoWork(Action action)
         {
             if (action == null)
-                throw new ArgumentNullException("action");
+                throw new ArgumentNullException(nameof(action));
 
             if (_abortAllCalled)
                 throw new InvalidOperationException("Cannot call DoWork() after AbortAll() or Dispose() have been called.");
@@ -78,7 +78,7 @@ namespace Abot.Util
                     if (!_isDisplosed && _numberOfRunningThreads >= MaxThreads)
                         _resetEvent.Reset();
 
-                    _logger.DebugFormat("Starting another thread, increasing running threads to [{0}].", _numberOfRunningThreads);
+                    _logger.LogDebug($"Starting another thread, increasing running threads to [{_numberOfRunningThreads}].");
                 }
                 RunActionOnDedicatedThread(action);
             }
@@ -111,17 +111,16 @@ namespace Abot.Util
             try
             {
                 action.Invoke();
-                _logger.Debug("Action completed successfully.");
+                _logger.LogDebug("Action completed successfully.");
             }
             catch (OperationCanceledException oce)
             {
-                _logger.DebugFormat("Thread cancelled.");
+                _logger.LogDebug($"Thread cancelled.");
                 throw;
             }
             catch (Exception e)
             {
-                _logger.Error("Error occurred while running action.");
-                _logger.Error(e);
+                _logger.LogError("Error occurred while running action.", e);
             }
             finally
             {
@@ -130,7 +129,7 @@ namespace Abot.Util
                     lock (_locker)
                     {
                         _numberOfRunningThreads--;
-                        _logger.DebugFormat("[{0}] threads are running.", _numberOfRunningThreads);
+                        _logger.LogDebug($"[{_numberOfRunningThreads}] threads are running.");
                         if (!_isDisplosed && _numberOfRunningThreads < MaxThreads)
                             _resetEvent.Set();
                     }

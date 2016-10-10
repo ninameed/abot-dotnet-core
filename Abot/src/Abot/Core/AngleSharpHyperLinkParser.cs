@@ -32,12 +32,12 @@ namespace Abot.Core
             if (HasRobotsNoFollow(crawledPage))
                 return null;
 
-            IEnumerable<string> hrefValues = crawledPage.AngleSharpHtmlDocument.QuerySelectorAll("a, area")
+            var hrefValues = crawledPage.AngleSharpHtmlDocument.QuerySelectorAll("a, area")
             .Where(e => !HasRelNoFollow(e))
             .Select(y => y.GetAttribute("href"))
             .Where(a => !string.IsNullOrWhiteSpace(a));
 
-            IEnumerable<string> canonicalHref = crawledPage.AngleSharpHtmlDocument
+            var canonicalHref = crawledPage.AngleSharpHtmlDocument
                 .QuerySelectorAll("link")
                 .Where(e => HasRelCanonicalPointingToDifferentUrl(e, crawledPage.Uri.ToString()))
                 .Select(e => e.GetAttribute("href"));

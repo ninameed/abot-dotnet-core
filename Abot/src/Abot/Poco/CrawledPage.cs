@@ -60,7 +60,7 @@ namespace Abot.Poco
             if(HttpWebResponse == null)
                 return Uri.AbsoluteUri;
             else
-                return string.Format("{0}[{1}]", Uri.AbsoluteUri, (int)HttpWebResponse.StatusCode);
+                return $"{Uri.AbsoluteUri}[{(int)HttpWebResponse.StatusCode}]";
         }
 
         /// <summary>
@@ -105,7 +105,7 @@ namespace Abot.Poco
 
         private HtmlDocument InitializeHtmlAgilityPackDocument()
         {
-            HtmlDocument hapDoc = new HtmlDocument();
+            var hapDoc = new HtmlDocument();
             //TODO How do we handle the following line
             //hapDoc.OptionMaxNestedChildNodes = 5000;//did not make this an externally configurable property since it is really an internal issue to hap
             try

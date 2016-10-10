@@ -1,4 +1,4 @@
-﻿using log4net;
+﻿using Microsoft.Extensions.Logging;
 using Robots;
 using System;
 
@@ -29,17 +29,17 @@ namespace Abot.Core
 
     public class RobotsDotText : IRobotsDotText
     {
-        ILog _logger = LogManager.GetLogger("AbotLogger");
+        ILogger _logger = new LoggerFactory().CreateLogger("AbotLogger");
         IRobots _robotsDotTextUtil = null;
         Uri _rootUri = null;
 
         public RobotsDotText(Uri rootUri, string content)
         {
             if (rootUri == null)
-                throw new ArgumentNullException("rootUri");
+                throw new ArgumentNullException(nameof(rootUri));
 
             if (content == null)
-                throw new ArgumentNullException("content");
+                throw new ArgumentNullException(nameof(content));
 
             _rootUri = rootUri;
             Load(rootUri, content);           

@@ -1,5 +1,5 @@
 ﻿using Abot.Poco;
-using log4net;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -20,7 +20,7 @@ namespace Abot.Core
 
     public abstract class HyperLinkParser : IHyperLinkParser
     {
-        protected ILog _logger = LogManager.GetLogger("AbotLogger");
+        protected ILogger _logger = new LoggerFactory().CreateLogger("AbotLogger");
         protected CrawlConfiguration _config;
         protected Func<string, string> _cleanURLFunc;
 
@@ -43,12 +43,12 @@ namespace Abot.Core
         {
             CheckParams(crawledPage);
 
-            Stopwatch timer = Stopwatch.StartNew();
+            var timer = Stopwatch.StartNew();
 
-            List<Uri> uris = GetUris(crawledPage, GetHrefValues(crawledPage));
+            var uris = GetUris(crawledPage, GetHrefValues(crawledPage));
             
             timer.Stop();
-            _logger.DebugFormat("{0} parsed links from [{1}] in [{2}] milliseconds", ParserType, crawledPage.Uri, timer.ElapsedMilliseconds);
+            _logger.LogDebug($"{ParserType} parsed links from [{crawledPage.Uri}] in [{timer.ElapsedMilliseconds}] milliseconds");
 
             return uris;
         }
@@ -68,21 +68,21 @@ namespace Abot.Core
         protected virtual void CheckParams(CrawledPage crawledPage)
         {
             if (crawledPage == null)
-                throw new ArgumentNullException("crawledPage");
+                throw new ArgumentNullException(nameof(crawledPage));
         }
 
         protected virtual List<Uri> GetUris(CrawledPage crawledPage, IEnumerable<string> hrefValues)
         {
-            List<Uri> uris = new List<Uri>();
+            var uris = new List<Uri>();
             if (hrefValues == null || hrefValues.Count() < 1)
                 return uris;
 
             //Use the uri of the page that actually responded to the request instead of crawledPage.Uri (Issue 82).
             //Using HttpWebRequest.Address instead of HttpWebResonse.ResponseUri since this is the best practice and mentioned on http://msdn.microsoft.com/en-us/library/system.net.httpwebresponse.responseuri.aspx
-            Uri uriToUse = crawledPage.HttpWebRequest.Address ?? crawledPage.Uri;
+            var uriToUse = crawledPage.HttpWebRequest.Address ?? crawledPage.Uri;
 
             //If html base tag exists use it instead of page uri for relative links
-            string baseHref = GetBaseHrefValue(crawledPage);
+            var baseHref = GetBaseHrefValue(crawledPage);
             if (!string.IsNullOrEmpty(baseHref))
             {
                 if (baseHref.StartsWith("//"))
@@ -95,8 +95,8 @@ namespace Abot.Core
                 catch { }
             }
 
-            string href = "";
-            foreach (string hrefValue in hrefValues)
+            var href = "";
+            foreach (var hrefValue in hrefValues)
             {
                 try
                 {
@@ -105,7 +105,7 @@ namespace Abot.Core
                     href = _config.IsRespectUrlNamedAnchorOrHashbangEnabled
                         ? hrefValue
                         : hrefValue.Split('#')[0];
-                    Uri newUri = new Uri(uriToUse, href);
+                    var newUri = new Uri(uriToUse, href);
 
                     if (_cleanURLFunc != null)
                         newUri = new Uri(_cleanURLFunc(newUri.AbsoluteUri));
@@ -115,8 +115,7 @@ namespace Abot.Core
                 }
                 catch (Exception e)
                 {
-                    _logger.DebugFormat("Could not parse link [{0}] on page [{1}]", hrefValue, crawledPage.Uri);
-                    _logger.Debug(e);
+                    _logger.LogDebug($"Could not parse link [{hrefValue}] on page [{crawledPage.Uri}]", e);
                 }
             }
 
@@ -133,7 +132,7 @@ namespace Abot.Core
                     (xRobotsTagHeader.ToLower().Contains("nofollow") ||
                      xRobotsTagHeader.ToLower().Contains("none")))
                 {
-                    _logger.InfoFormat("Http header X-Robots-Tag nofollow detected on uri [{0}], will not crawl links on this page.", crawledPage.Uri);
+                    _logger.LogInfo($"Http header X-Robots-Tag nofollow detected on uri [{crawledPage.Uri}], will not crawl links on this page.");
                     return true;
                 }   
             }
@@ -141,12 +140,12 @@ namespace Abot.Core
             //Meta robots tag
             if (_config.IsRespectMetaRobotsNoFollowEnabled)
             {
-                string robotsMeta = GetMetaRobotsValue(crawledPage);
+                var robotsMeta = GetMetaRobotsValue(crawledPage);
                 if (robotsMeta != null &&
                     (robotsMeta.ToLower().Contains("nofollow") ||
                      robotsMeta.ToLower().Contains("none")))
                 {
-                    _logger.InfoFormat("Meta Robots nofollow tag detected on uri [{0}], will not crawl links on this page.", crawledPage.Uri);
+                    _logger.LogInfo($"Meta Robots nofollow tag detected on uri [{crawledPage.Uri}], will not crawl links on this page.");
                     return true;
                 }                
                 

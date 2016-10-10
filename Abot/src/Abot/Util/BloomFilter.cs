@@ -75,18 +75,18 @@ namespace Abot.Util
 			// validate the params are in range
 			if (capacity < 1)
 			{
-				throw new ArgumentOutOfRangeException("capacity", capacity, "capacity must be > 0");
+				throw new ArgumentOutOfRangeException(nameof(capacity), capacity, "capacity must be > 0");
 			}
  
 			if (errorRate >= 1 || errorRate <= 0)
 			{
-				throw new ArgumentOutOfRangeException("errorRate", errorRate, string.Format("errorRate must be between 0 and 1, exclusive. Was {0}", errorRate));
+				throw new ArgumentOutOfRangeException(nameof(errorRate), errorRate, $"errorRate must be between 0 and 1, exclusive. Was {errorRate}");
 			}
  
 			// from overflow in bestM calculation
 			if (m < 1)
 			{
-				throw new ArgumentOutOfRangeException(string.Format("The provided capacity and errorRate values would result in an array of length > int.MaxValue. Please reduce either of these values. Capacity: {0}, Error rate: {1}", capacity, errorRate));
+				throw new ArgumentOutOfRangeException($"The provided capacity and errorRate values would result in an array of length > int.MaxValue. Please reduce either of these values. Capacity: {capacity}, Error rate: {errorRate}");
 			}
  
 			// set the secondary hash function
@@ -102,7 +102,7 @@ namespace Abot.Util
 				}
 				else
 				{
-					throw new ArgumentNullException("hashFunction", "Please provide a hash function for your type T, when T is not a string or int.");
+					throw new ArgumentNullException(nameof(hashFunction), "Please provide a hash function for your type T, when T is not a string or int.");
 				}
 			}
 			else
@@ -139,11 +139,11 @@ namespace Abot.Util
 		public void Add(T item)
 		{
 			// start flipping bits for each hash of item
-			int primaryHash = item.GetHashCode();
-			int secondaryHash = this._getHashSecondary(item);
-			for (int i = 0; i < this._hashFunctionCount; i++)
+			var primaryHash = item.GetHashCode();
+			var secondaryHash = this._getHashSecondary(item);
+			for (var i = 0; i < this._hashFunctionCount; i++)
 			{
-				int hash = this.ComputeHash(primaryHash, secondaryHash, i);
+				var hash = this.ComputeHash(primaryHash, secondaryHash, i);
 				this._hashBits[hash] = true;
 			}
 		}
@@ -155,11 +155,11 @@ namespace Abot.Util
 		/// <returns> The <see cref="bool"/>. </returns>
 		public bool Contains(T item)
 		{
-			int primaryHash = item.GetHashCode();
-			int secondaryHash = this._getHashSecondary(item);
-			for (int i = 0; i < this._hashFunctionCount; i++)
+			var primaryHash = item.GetHashCode();
+			var secondaryHash = this._getHashSecondary(item);
+			for (var i = 0; i < this._hashFunctionCount; i++)
 			{
-				int hash = this.ComputeHash(primaryHash, secondaryHash, i);
+				var hash = this.ComputeHash(primaryHash, secondaryHash, i);
 				if (this._hashBits[hash] == false)
 				{
 					return false;
@@ -198,7 +198,7 @@ namespace Abot.Util
 		/// <returns> The <see cref="float"/>. </returns>
 		private static float BestErrorRate(int capacity)
 		{
-			float c = (float)(1.0 / capacity);
+			var c = (float)(1.0 / capacity);
 			if (c != 0)
 			{
 				return c;
@@ -217,7 +217,7 @@ namespace Abot.Util
 		/// <returns>The hashed result.</returns>
 		private static int HashInt32(T input)
 		{
-			uint? x = input as uint?;
+			var x = input as uint?;
 			unchecked
 			{
 				x = ~x + (x << 15); // x = (x << 15) - x- 1, as (~x) + y is equivalent to y - x - 1 in two's complement representation
@@ -238,10 +238,10 @@ namespace Abot.Util
 		/// <returns>The hashed result.</returns>
 		private static int HashString(T input)
 		{
-			string s = input as string;
-			int hash = 0;
+			var s = input as string;
+			var hash = 0;
  
-			for (int i = 0; i < s.Length; i++)
+			for (var i = 0; i < s.Length; i++)
 			{
 				hash += s[i];
 				hash += (hash << 10);
@@ -260,7 +260,7 @@ namespace Abot.Util
 		/// <returns> The <see cref="int"/>. </returns>
 		private int TrueBits()
 		{
-			int output = 0;
+			var output = 0;
 			foreach (bool bit in this._hashBits)
 			{
 				if (bit == true)
@@ -281,7 +281,7 @@ namespace Abot.Util
 		/// <returns> The <see cref="int"/>. </returns>
 		private int ComputeHash(int primaryHash, int secondaryHash, int i)
 		{
-			int resultingHash = (primaryHash + (i * secondaryHash)) % this._hashBits.Count;
+			var resultingHash = (primaryHash + (i * secondaryHash)) % this._hashBits.Count;
 			return Math.Abs((int)resultingHash);
 		}
 	}

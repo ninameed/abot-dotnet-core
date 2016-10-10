@@ -1,7 +1,8 @@
 ﻿using Abot.Poco;
-using log4net;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Net;
+using System.Threading.Tasks;
 
 namespace Abot.Core
 {
@@ -17,36 +18,36 @@ namespace Abot.Core
         /// </summary>
         /// <param name="rootUri">The root domain</param>
         /// <returns>Object representing the robots.txt file or returns null</returns>
-        IRobotsDotText Find(Uri rootUri);
+        Task<IRobotsDotText> Find(Uri rootUri);
     }
 
     public class RobotsDotTextFinder : IRobotsDotTextFinder
     {
-        static ILog _logger = LogManager.GetLogger("AbotLogger");
+        static ILogger _logger = new LoggerFactory().CreateLogger("AbotLogger");
         IPageRequester _pageRequester;
 
         public RobotsDotTextFinder(IPageRequester pageRequester)
         {
             if (pageRequester == null)
-                throw new ArgumentNullException("pageRequester");
+                throw new ArgumentNullException(nameof(pageRequester));
 
             _pageRequester = pageRequester;
         }
 
-        public IRobotsDotText Find(Uri rootUri)
+        public async Task<IRobotsDotText> Find(Uri rootUri)
         {
             if (rootUri == null)
-                throw new ArgumentNullException("rootUri");
+                throw new ArgumentNullException(nameof(rootUri));
 
-            Uri robotsUri = new Uri(rootUri, "/robots.txt");
-            CrawledPage page = _pageRequester.MakeRequest(robotsUri);
+            var robotsUri = new Uri(rootUri, "/robots.txt");
+            var page = await _pageRequester.MakeRequestAsync(robotsUri);
             if (page == null || page.WebException != null || page.HttpWebResponse == null || page.HttpWebResponse.StatusCode != HttpStatusCode.OK)
             {
-                _logger.DebugFormat("Did not find robots.txt file at [{0}]", robotsUri);
+                _logger.LogDebug($"Did not find robots.txt file at [{robotsUri}]");
                 return null;
             }
 
-            _logger.DebugFormat("Found robots.txt file at [{0}]", robotsUri);
+            _logger.LogDebug($"Found robots.txt file at [{robotsUri}]");
             return new RobotsDotText(rootUri, page.Content.Text);
         }
     }

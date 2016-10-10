@@ -26,7 +26,7 @@ namespace Abot.Util
         // Creates a new instance with the specified degree of parallelism.  
         public LimitedConcurrencyLevelTaskScheduler(int maxDegreeOfParallelism)
         {
-            if (maxDegreeOfParallelism < 1) throw new ArgumentOutOfRangeException("maxDegreeOfParallelism");
+            if (maxDegreeOfParallelism < 1) throw new ArgumentOutOfRangeException(nameof(maxDegreeOfParallelism));
             _maxDegreeOfParallelism = maxDegreeOfParallelism;
         }
 
@@ -113,7 +113,7 @@ namespace Abot.Util
         // Gets an enumerable of the tasks currently scheduled on this scheduler.  
         protected sealed override IEnumerable<Task> GetScheduledTasks()
         {
-            bool lockTaken = false;
+            var lockTaken = false;
             try
             {
                 Monitor.TryEnter(_tasks, ref lockTaken);

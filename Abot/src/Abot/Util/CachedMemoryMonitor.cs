@@ -1,5 +1,6 @@
-﻿using log4net;
+﻿using Microsoft.Extensions.Logging;
 using System;
+using System.Threading;
 using System.Timers;
 
 namespace Abot.Util
@@ -7,7 +8,7 @@ namespace Abot.Util
     
     public class CachedMemoryMonitor : IMemoryMonitor, IDisposable
     {
-        static ILog _logger = LogManager.GetLogger("AbotLogger");
+        static ILogger _logger = new LoggerFactory().CreateLogger("AbotLogger");
         IMemoryMonitor _memoryMonitor;
         Timer _usageRefreshTimer;
         int _cachedCurrentUsageInMb;
@@ -15,7 +16,7 @@ namespace Abot.Util
         public CachedMemoryMonitor(IMemoryMonitor memoryMonitor, int cacheExpirationInSeconds)
         {
             if (memoryMonitor == null)
-                throw new ArgumentNullException("memoryMonitor");
+                throw new ArgumentNullException(nameof(memoryMonitor));
 
             if (cacheExpirationInSeconds < 1)
                 cacheExpirationInSeconds = 5;
@@ -31,9 +32,9 @@ namespace Abot.Util
 
         protected virtual void UpdateCurrentUsageValue()
         {
-            int oldUsage = _cachedCurrentUsageInMb;
+            var oldUsage = _cachedCurrentUsageInMb;
             _cachedCurrentUsageInMb = _memoryMonitor.GetCurrentUsageInMb();
-            _logger.DebugFormat("Updated cached memory usage value from [{0}mb] to [{1}mb]", oldUsage, _cachedCurrentUsageInMb);
+            _logger.LogDebug($"Updated cached memory usage value from [{oldUsage}mb] to [{_cachedCurrentUsageInMb}mb]");
         }
 
         public virtual int GetCurrentUsageInMb()

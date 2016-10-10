@@ -1,5 +1,5 @@
 ﻿using Abot.Util;
-using log4net;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Concurrent;
 using System.Diagnostics;
@@ -34,7 +34,7 @@ namespace Abot.Core
 
     public class DomainRateLimiter : IDomainRateLimiter
     {
-        static ILog _logger = LogManager.GetLogger("AbotLogger");
+        static ILogger _logger = new LoggerFactory().CreateLogger("AbotLogger");
         ConcurrentDictionary<string, IRateLimiter> _rateLimiterLookup = new ConcurrentDictionary<string, IRateLimiter>();
         long _defaultMinCrawlDelayInMillisecs;
 
@@ -50,24 +50,24 @@ namespace Abot.Core
         public void RateLimit(Uri uri)
         {
             if (uri == null)
-                throw new ArgumentNullException("uri");
+                throw new ArgumentNullException(nameof(uri));
 
-            IRateLimiter rateLimiter = GetRateLimter(uri, _defaultMinCrawlDelayInMillisecs);
+            var rateLimiter = GetRateLimter(uri, _defaultMinCrawlDelayInMillisecs);
             if (rateLimiter == null)
                 return;
 
-            Stopwatch timer = Stopwatch.StartNew();
+            var timer = Stopwatch.StartNew();
             rateLimiter.WaitToProceed();
             timer.Stop();
 
             if(timer.ElapsedMilliseconds > 10)
-                _logger.DebugFormat("Rate limited [{0}] [{1}] milliseconds", uri.AbsoluteUri, timer.ElapsedMilliseconds);
+                _logger.LogDebug($"Rate limited [{uri.AbsoluteUri}] [{timer.ElapsedMilliseconds}] milliseconds");
         }
 
         public void AddDomain(Uri uri, long minCrawlDelayInMillisecs)
         {
             if (uri == null)
-                throw new ArgumentNullException("uri");
+                throw new ArgumentNullException(nameof(uri));
 
             if (minCrawlDelayInMillisecs < 1)
                 throw new ArgumentException("minCrawlDelayInMillisecs");
@@ -78,7 +78,7 @@ namespace Abot.Core
         public void AddOrUpdateDomain(Uri uri, long minCrawlDelayInMillisecs)
         {
             if (uri == null)
-                throw new ArgumentNullException("uri");
+                throw new ArgumentNullException(nameof(uri));
 
             if (minCrawlDelayInMillisecs < 1)
                 throw new ArgumentException("minCrawlDelayInMillisecs");
@@ -89,7 +89,7 @@ namespace Abot.Core
                 var rateLimiter = new RateLimiter(1, TimeSpan.FromMilliseconds(delayToUse));
 
                 _rateLimiterLookup.AddOrUpdate(uri.Authority, rateLimiter, (key, oldValue) => rateLimiter);
-                _logger.DebugFormat("Added/updated domain [{0}] with minCrawlDelayInMillisecs of [{1}] milliseconds", uri.Authority, delayToUse);
+                _logger.LogDebug($"Added/updated domain [{uri.Authority}] with minCrawlDelayInMillisecs of [{delayToUse}] milliseconds");
             }
         }
 
@@ -110,9 +110,9 @@ namespace Abot.Core
                 rateLimiter = new RateLimiter(1, TimeSpan.FromMilliseconds(minCrawlDelayInMillisecs));
 
                 if (_rateLimiterLookup.TryAdd(uri.Authority, rateLimiter))
-                    _logger.DebugFormat("Added new domain [{0}] with minCrawlDelayInMillisecs of [{1}] milliseconds", uri.Authority, minCrawlDelayInMillisecs);
+                    _logger.LogDebug($"Added new domain [{uri.Authority}] with minCrawlDelayInMillisecs of [{minCrawlDelayInMillisecs}] milliseconds");
                 else
-                    _logger.WarnFormat("Unable to add new domain [{0}] with minCrawlDelayInMillisecs of [{1}] milliseconds", uri.Authority, minCrawlDelayInMillisecs);
+                    _logger.LogWarn($"Unable to add new domain [{uri.Authority}] with minCrawlDelayInMillisecs of [{minCrawlDelayInMillisecs}] milliseconds");
             }
 
             return rateLimiter;

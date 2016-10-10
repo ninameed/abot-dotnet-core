@@ -29,13 +29,13 @@ namespace Abot.Core
 
         protected override IEnumerable<string> GetHrefValues(CrawledPage crawledPage)
         {
-            List<string> hrefValues = new List<string>();
+            var hrefValues = new List<string>();
             if (HasRobotsNoFollow(crawledPage))
                 return hrefValues;
 
-            HtmlNodeCollection aTags = crawledPage.HtmlDocument.DocumentNode.SelectNodes("//a[@href]");
-            HtmlNodeCollection areaTags = crawledPage.HtmlDocument.DocumentNode.SelectNodes("//area[@href]");
-            HtmlNodeCollection canonicals = crawledPage.HtmlDocument.DocumentNode.SelectNodes("//link[@rel='canonical'][@href]");
+            var aTags = crawledPage.HtmlDocument.DocumentNode.SelectNodes("//a[@href]");
+            var areaTags = crawledPage.HtmlDocument.DocumentNode.SelectNodes("//area[@href]");
+            var canonicals = crawledPage.HtmlDocument.DocumentNode.SelectNodes("//link[@rel='canonical'][@href]");
 
             hrefValues.AddRange(GetLinks(aTags));
             hrefValues.AddRange(GetLinks(areaTags));
@@ -46,8 +46,8 @@ namespace Abot.Core
 
         protected override string GetBaseHrefValue(CrawledPage crawledPage)
         {
-            string hrefValue = "";
-            HtmlNode node = crawledPage.HtmlDocument.DocumentNode.SelectSingleNode("//base");
+            var hrefValue = "";
+            var node = crawledPage.HtmlDocument.DocumentNode.SelectSingleNode("//base");
 
             //Must use node.InnerHtml instead of node.InnerText since "aaa<br />bbb" will be returned as "aaabbb"
             if (node != null)
@@ -59,7 +59,7 @@ namespace Abot.Core
         protected override string GetMetaRobotsValue(CrawledPage crawledPage)
         {
             string robotsMeta = null;
-            HtmlNode robotsNode = crawledPage.HtmlDocument.DocumentNode.SelectSingleNode("//meta[translate(@name,'ABCDEFGHIJKLMNOPQRSTUVWXYZ','abcdefghijklmnopqrstuvwxyz')='robots']");
+            var robotsNode = crawledPage.HtmlDocument.DocumentNode.SelectSingleNode("//meta[translate(@name,'ABCDEFGHIJKLMNOPQRSTUVWXYZ','abcdefghijklmnopqrstuvwxyz')='robots']");
             if (robotsNode != null)
                 robotsMeta = robotsNode.GetAttributeValue("content", "");
 
@@ -68,13 +68,13 @@ namespace Abot.Core
 
         protected virtual List<string> GetLinks(HtmlNodeCollection nodes)
         {
-            List<string> hrefs = new List<string>();
+            var hrefs = new List<string>();
 
             if (nodes == null)
                 return hrefs;
 
-            string hrefValue = "";
-            foreach (HtmlNode node in nodes)
+            var hrefValue = "";
+            foreach (var node in nodes)
             {
                 if (HasRelNoFollow(node))
                     continue;
@@ -92,7 +92,7 @@ namespace Abot.Core
 
         protected virtual string DeEntitize(string hrefValue)
         {
-            string dentitizedHref = hrefValue;
+            var dentitizedHref = hrefValue;
             
             try
             {
@@ -100,7 +100,7 @@ namespace Abot.Core
             }
             catch (Exception e)
             {
-                _logger.InfoFormat("Error dentitizing uri: {0} This usually means that it contains unexpected characters", hrefValue);
+                _logger.LogInfo($"Error dentitizing uri: {hrefValue} This usually means that it contains unexpected characters");
             }
 
             return dentitizedHref;
@@ -108,7 +108,7 @@ namespace Abot.Core
 
         protected virtual bool HasRelNoFollow(HtmlNode node)
         {
-            HtmlAttribute attr = node.Attributes["rel"];
+            var attr = node.Attributes["rel"];
             return _config.IsRespectAnchorRelNoFollowEnabled && (attr != null && attr.Value.ToLower().Trim() == "nofollow");
         }
     }

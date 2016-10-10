@@ -5,30 +5,30 @@ using System.Threading;
 using System.Threading.Tasks;
 using Abot.Poco;
 using Abot.Util;
-using log4net;
+using Microsoft.Extensions.Logging;
 
 namespace Abot.Crawler
 {
     public class AsyncWebCrawler : WebCrawler
     {
-        static ILog _logger = LogManager.GetLogger("AbotLogger");
+        static ILogger _logger = new LoggerFactory().CreateLogger("AbotLogger");
 
         protected virtual void CrawlSite()
         {
             // Create a scheduler that uses two threads. 
-            LimitedConcurrencyLevelTaskScheduler lcts = new LimitedConcurrencyLevelTaskScheduler(2);//TODO get this from config and set in constructor
+            var lcts = new LimitedConcurrencyLevelTaskScheduler(2);//TODO get this from config and set in constructor
             //List<Task> tasks = new List<Task>();
 
             // Create a TaskFactory and pass it our custom scheduler. 
-            TaskFactory factory = new TaskFactory(lcts);
+            var factory = new TaskFactory(lcts);
 
-            Object lockObj = new Object();
+            var lockObj = new Object();
 
-            BlockingCollection<PageToCrawl> pagesToCrawl = new BlockingCollection<PageToCrawl>();
+            var pagesToCrawl = new BlockingCollection<PageToCrawl>();
 
-            foreach (PageToCrawl page in pagesToCrawl.GetConsumingEnumerable())
+            foreach (var page in pagesToCrawl.GetConsumingEnumerable())
             {
-                Task t = factory.StartNew(() =>
+                var t = factory.StartNew(() =>
                 {
                     ProcessPage(_scheduler.GetNext());
                 }, _crawlContext.CancellationTokenSource.Token);
@@ -41,7 +41,7 @@ namespace Abot.Crawler
                 RunPreWorkChecks();
 
                 // Use our factory to run a set of tasks. 
-                int outputItem = 0;
+                var outputItem = 0;
 
                    //tasks.Add(t);
 
@@ -61,7 +61,7 @@ namespace Abot.Crawler
                 //}
                 //else
                 //{
-                //    _logger.DebugFormat("Waiting for links to be scheduled...");
+                //    _logger.LogDebug($"Waiting for links to be scheduled...");
                 //    Thread.Sleep(2500);
                 //}
             }
