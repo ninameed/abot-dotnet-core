@@ -2,6 +2,7 @@
 using Abot.Poco;
 using Microsoft.Extensions.Logging;
 using System;
+using System.Threading.Tasks;
 using Robots;
 
 namespace Abot.Crawler
@@ -60,7 +61,7 @@ namespace Abot.Crawler
             _robotsDotTextFinder = robotsDotTextFinder ?? new RobotsDotTextFinder(new PageRequester(_crawlContext.CrawlConfiguration));
         }
 
-        public override CrawlResult Crawl(Uri uri, CancellationTokenSource cancellationTokenSource)
+        public override async Task<CrawlResult> CrawlAsync(Uri uri, CancellationTokenSource cancellationTokenSource)
         {
             var robotsDotTextCrawlDelayInSecs = 0;
             var robotsDotTextCrawlDelayInMillisecs = 0;
@@ -68,7 +69,7 @@ namespace Abot.Crawler
             //Load robots.txt
             if (_crawlContext.CrawlConfiguration.IsRespectRobotsDotTextEnabled)
             {
-                _robotsDotText = _robotsDotTextFinder.Find(uri);
+                _robotsDotText = await _robotsDotTextFinder.FindAsync(uri);
 
                 if (_robotsDotText != null)
                 {
@@ -97,7 +98,7 @@ namespace Abot.Crawler
 
             PageCrawlStarting += (s, e) => _domainRateLimiter.RateLimit(e.PageToCrawl.Uri);
 
-            return base.Crawl(uri, cancellationTokenSource);
+            return await base.CrawlAsync(uri, cancellationTokenSource);
         }
 
         protected override bool ShouldCrawlPage(PageToCrawl pageToCrawl)

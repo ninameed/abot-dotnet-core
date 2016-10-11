@@ -18,7 +18,7 @@ namespace Abot.Core
         /// </summary>
         /// <param name="rootUri">The root domain</param>
         /// <returns>Object representing the robots.txt file or returns null</returns>
-        Task<IRobotsDotText> Find(Uri rootUri);
+        Task<IRobotsDotText> FindAsync(Uri rootUri);
     }
 
     public class RobotsDotTextFinder : IRobotsDotTextFinder
@@ -34,7 +34,7 @@ namespace Abot.Core
             _pageRequester = pageRequester;
         }
 
-        public async Task<IRobotsDotText> Find(Uri rootUri)
+        public async Task<IRobotsDotText> FindAsync(Uri rootUri)
         {
             if (rootUri == null)
                 throw new ArgumentNullException(nameof(rootUri));

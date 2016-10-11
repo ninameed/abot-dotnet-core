@@ -91,12 +91,12 @@ namespace Abot.Crawler
         /// <summary>
         /// Begins a crawl using the uri param
         /// </summary>
-        CrawlResult Crawl(Uri uri);
+        Task<CrawlResult> CrawlAsync(Uri uri);
 
         /// <summary>
         /// Begins a crawl using the uri param, and can be cancelled using the CancellationToken
         /// </summary>
-        CrawlResult Crawl(Uri uri, CancellationTokenSource tokenSource);
+        Task<CrawlResult> CrawlAsync(Uri uri, CancellationTokenSource tokenSource);
 
         /// <summary>
         /// Dynamic object that can hold any value that needs to be available in the crawl context
@@ -164,7 +164,7 @@ namespace Abot.Crawler
             IMemoryManager memoryManager)
         {
             _crawlContext = new CrawlContext();
-            _crawlContext.CrawlConfiguration = crawlConfiguration ?? GetCrawlConfigurationFromConfigFile();
+            _crawlContext.CrawlConfiguration = crawlConfiguration ?? new CrawlConfiguration();//GetCrawlConfigurationFromConfigFile();
             CrawlBag = _crawlContext.CrawlBag;
 
             _threadManager = threadManager ?? new TaskThreadManager(_crawlContext.CrawlConfiguration.MaxConcurrentThreads > 0 ? _crawlContext.CrawlConfiguration.MaxConcurrentThreads : Environment.ProcessorCount);
@@ -186,15 +186,15 @@ namespace Abot.Crawler
         /// <summary>
         /// Begins a synchronous crawl using the uri param, subscribe to events to process data as it becomes available
         /// </summary>
-        public virtual CrawlResult Crawl(Uri uri)
+        public virtual async Task<CrawlResult> CrawlAsync(Uri uri)
         {
-            return Crawl(uri, null);
+            return await CrawlAsync(uri, null);
         }
 
         /// <summary>
         /// Begins a synchronous crawl using the uri param, subscribe to events to process data as it becomes available
         /// </summary>
-        public virtual CrawlResult Crawl(Uri uri, CancellationTokenSource cancellationTokenSource)
+        public virtual async Task<CrawlResult> CrawlAsync(Uri uri, CancellationTokenSource cancellationTokenSource)
         {
             if (uri == null)
                 throw new ArgumentNullException(nameof(uri));
@@ -233,7 +233,7 @@ namespace Abot.Crawler
                     _scheduler.Add(rootPage);
 
                 VerifyRequiredAvailableMemory();
-                CrawlSite();
+                await CrawlSite();
             }
             catch (Exception e)
             {
@@ -242,12 +242,10 @@ namespace Abot.Crawler
             }
             finally
             {
-                if (_threadManager != null)
-                    _threadManager.Dispose();
+                _threadManager?.Dispose();
             }
 
-            if (_timeoutTimer != null)
-                _timeoutTimer.Dispose();
+            _timeoutTimer?.Dispose();
 
             timer.Stop();
 
@@ -487,18 +485,18 @@ namespace Abot.Crawler
             _isInternalDecisionMaker = decisionMaker;
         }
 
-        private CrawlConfiguration GetCrawlConfigurationFromConfigFile()
-        {
-            AbotConfigurationSectionHandler configFromFile = AbotConfigurationSectionHandler.LoadFromXml();
+        //private CrawlConfiguration GetCrawlConfigurationFromConfigFile()
+        //{
+        //    AbotConfigurationSectionHandler configFromFile = AbotConfigurationSectionHandler.LoadFromXml();
 
-            if (configFromFile == null)
-                throw new InvalidOperationException("abot config section was NOT found");
+        //    if (configFromFile == null)
+        //        throw new InvalidOperationException("abot config section was NOT found");
 
-            _logger.LogDebug($"abot config section was found");
-            return configFromFile.Convert();
-        }
+        //    _logger.LogDebug($"abot config section was found");
+        //    return configFromFile.Convert();
+        //}
 
-        protected virtual void CrawlSite()
+        protected virtual async Task CrawlSite()
         {
             while (!_crawlComplete)
             {
@@ -506,7 +504,7 @@ namespace Abot.Crawler
 
                 if (_scheduler.Count > 0)
                 {
-                    _threadManager.DoWork(() => ProcessPage(_scheduler.GetNext()));
+                    _threadManager.DoWork(() => ProcessPageAsync(_scheduler.GetNext()));
                 }
                 else if (!_threadManager.HasRunningThreads())
                 {
@@ -515,7 +513,7 @@ namespace Abot.Crawler
                 else
                 {
                     _logger.LogDebug($"Waiting for links to be scheduled...");
-                    Thread.Sleep(2500);
+                    await Task.Delay(2500);
                 }
             }
         }
@@ -625,7 +623,7 @@ namespace Abot.Crawler
         }
 
         //protected virtual async Task ProcessPage(PageToCrawl pageToCrawl)
-        protected virtual void ProcessPage(PageToCrawl pageToCrawl)
+        protected virtual async Task ProcessPageAsync(PageToCrawl pageToCrawl)
         {
             try
             {
@@ -637,7 +635,7 @@ namespace Abot.Crawler
                 AddPageToContext(pageToCrawl);
 
                 //CrawledPage crawledPage = await CrawlThePage(pageToCrawl);
-                CrawledPage crawledPage = CrawlThePage(pageToCrawl);
+                CrawledPage crawledPage = await CrawlThePageAsync(pageToCrawl);
 
                 // Validate the root uri in case of a redirection.
                 if (crawledPage.IsRoot)
@@ -839,7 +837,7 @@ namespace Abot.Crawler
         }
 
         //protected virtual async Task<CrawledPage> CrawlThePage(PageToCrawl pageToCrawl)
-        protected virtual async Task<CrawledPage> CrawlThePage(PageToCrawl pageToCrawl)
+        protected virtual async Task<CrawledPage> CrawlThePageAsync(PageToCrawl pageToCrawl)
         {
             _logger.LogDebug($"About to crawl page [{pageToCrawl.Uri.AbsoluteUri}]");
             FirePageCrawlStartingEventAsync(pageToCrawl);
