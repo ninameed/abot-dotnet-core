@@ -1,7 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 using System;
 using System.Threading;
-using System.Timers;
 
 namespace Abot.Util
 {
@@ -25,12 +24,10 @@ namespace Abot.Util
 
             UpdateCurrentUsageValue();
 
-            _usageRefreshTimer = new Timer(cacheExpirationInSeconds * 1000);
-            _usageRefreshTimer.Elapsed += (sender, e) => UpdateCurrentUsageValue();
-            _usageRefreshTimer.Start();
+            _usageRefreshTimer = new Timer(UpdateCurrentUsageValue, null, 0, cacheExpirationInSeconds * 1000);
         }
 
-        protected virtual void UpdateCurrentUsageValue()
+        protected virtual void UpdateCurrentUsageValue(object state = null)
         {
             var oldUsage = _cachedCurrentUsageInMb;
             _cachedCurrentUsageInMb = _memoryMonitor.GetCurrentUsageInMb();
@@ -44,7 +41,6 @@ namespace Abot.Util
 
         public void Dispose()
         {
-            _usageRefreshTimer.Stop();
             _usageRefreshTimer.Dispose();
         }
     }

@@ -223,9 +223,7 @@ namespace Abot.Crawler
 
             if (_crawlContext.CrawlConfiguration.CrawlTimeoutSeconds > 0)
             {
-                _timeoutTimer = new Timer(_crawlContext.CrawlConfiguration.CrawlTimeoutSeconds * 1000);
-                _timeoutTimer.Elapsed += HandleCrawlTimeout;
-                _timeoutTimer.Start();
+                _timeoutTimer = new Timer(HandleCrawlTimeout, null, 0, _crawlContext.CrawlConfiguration.CrawlTimeoutSeconds * 1000);
             }
 
             try
@@ -249,7 +247,7 @@ namespace Abot.Crawler
             }
 
             if (_timeoutTimer != null)
-                _timeoutTimer.Stop();
+                _timeoutTimer.Dispose();
 
             timer.Stop();
 
@@ -616,11 +614,11 @@ namespace Abot.Crawler
             }
         }
 
-        protected virtual void HandleCrawlTimeout(object sender, ElapsedEventArgs e)
+        protected virtual void HandleCrawlTimeout(object state)
         {
-            var elapsedTimer = sender as Timer;
+            var elapsedTimer = state as Timer;
             if (elapsedTimer != null)
-                elapsedTimer.Stop();
+                elapsedTimer.Dispose();
 
             _logger.LogInformation($"Crawl timeout of [{_crawlContext.CrawlConfiguration.CrawlTimeoutSeconds}] seconds has been reached for [{_crawlContext.RootUri}]");
             _crawlContext.IsCrawlHardStopRequested = true;

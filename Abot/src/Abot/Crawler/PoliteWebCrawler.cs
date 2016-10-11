@@ -135,7 +135,7 @@ namespace Abot.Crawler
             }
             else if (!allowedByRobots)
             {
-                var message = $"Page [{pageToCrawl.Uri.AbsoluteUri}] not crawled, [Disallowed by robots.txt file], set IsRespectRobotsDotText=false in config file if you would like to ignore robots.txt files.");
+                var message = $"Page [{pageToCrawl.Uri.AbsoluteUri}] not crawled, [Disallowed by robots.txt file], set IsRespectRobotsDotText=false in config file if you would like to ignore robots.txt files.";
                 _logger.LogDebug(message);
 
                 FirePageCrawlDisallowedEventAsync(pageToCrawl, message);
@@ -186,9 +186,7 @@ namespace Abot.Crawler
             }
             catch (Exception e)
             {
-                _logger.Error(
-                    "An unhandled exception was thrown by a subscriber of the PageLinksCrawlDisallowed event for robots.txt");
-                _logger.Error(e);
+                _logger.LogError("An unhandled exception was thrown by a subscriber of the PageLinksCrawlDisallowed event for robots.txt", e);
             }
         }
     }
