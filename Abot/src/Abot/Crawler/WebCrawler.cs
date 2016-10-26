@@ -1057,7 +1057,7 @@ namespace Abot.Crawler
                 // Check if the location is absolute. If not, create an absolute uri.
                 if (!Uri.TryCreate(location, UriKind.Absolute, out locationUri))
                 {
-                    var baseUri = new Uri(crawledPage.Uri.GetLeftPart(UriPartial.Authority));
+                    var baseUri = new Uri(crawledPage.Uri.GetComponents((UriComponents.Scheme | UriComponents.UserInfo | UriComponents.Host | UriComponents.Port), UriFormat.UriEscaped));
                     locationUri = new Uri(baseUri, location);
                 }
             }
