@@ -132,7 +132,7 @@ namespace Abot.Core
                     (xRobotsTagHeader.ToLower().Contains("nofollow") ||
                      xRobotsTagHeader.ToLower().Contains("none")))
                 {
-                    _logger.LogInfo($"Http header X-Robots-Tag nofollow detected on uri [{crawledPage.Uri}], will not crawl links on this page.");
+                    _logger.LogInformation($"Http header X-Robots-Tag nofollow detected on uri [{crawledPage.Uri}], will not crawl links on this page.");
                     return true;
                 }   
             }
@@ -145,7 +145,7 @@ namespace Abot.Core
                     (robotsMeta.ToLower().Contains("nofollow") ||
                      robotsMeta.ToLower().Contains("none")))
                 {
-                    _logger.LogInfo($"Meta Robots nofollow tag detected on uri [{crawledPage.Uri}], will not crawl links on this page.");
+                    _logger.LogInformation($"Meta Robots nofollow tag detected on uri [{crawledPage.Uri}], will not crawl links on this page.");
                     return true;
                 }                
                 

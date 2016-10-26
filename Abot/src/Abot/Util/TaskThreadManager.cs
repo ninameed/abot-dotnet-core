@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 
 namespace Abot.Util
 {
@@ -57,9 +58,9 @@ namespace Abot.Util
             foreach (var exception in aggException.InnerExceptions)
             {
                 if(_cancellationTokenSource.IsCancellationRequested)
-                    _logger.Warn(exception);//If the task was cancelled then this exception is expected happen and we dont care
+                    _logger.LogWarning(exception.ToString());//If the task was cancelled then this exception is expected happen and we dont care
                 else
-                    _logger.Error(exception);//If the task was not cancelled then this is an error
+                    _logger.LogError(exception.ToString());//If the task was not cancelled then this is an error
             }
         }
     }

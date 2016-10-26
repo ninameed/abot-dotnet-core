@@ -112,7 +112,7 @@ namespace Abot.Core
                 if (_rateLimiterLookup.TryAdd(uri.Authority, rateLimiter))
                     _logger.LogDebug($"Added new domain [{uri.Authority}] with minCrawlDelayInMillisecs of [{minCrawlDelayInMillisecs}] milliseconds");
                 else
-                    _logger.LogWarn($"Unable to add new domain [{uri.Authority}] with minCrawlDelayInMillisecs of [{minCrawlDelayInMillisecs}] milliseconds");
+                    _logger.LogWarning($"Unable to add new domain [{uri.Authority}] with minCrawlDelayInMillisecs of [{minCrawlDelayInMillisecs}] milliseconds");
             }
 
             return rateLimiter;

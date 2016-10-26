@@ -2,6 +2,7 @@
 using HtmlAgilityPack;
 using System;
 using System.Collections.Generic;
+using Microsoft.Extensions.Logging;
 
 namespace Abot.Core
 {
@@ -100,7 +101,7 @@ namespace Abot.Core
             }
             catch (Exception e)
             {
-                _logger.LogInfo($"Error dentitizing uri: {hrefValue} This usually means that it contains unexpected characters");
+                _logger.LogInformation($"Error dentitizing uri: {hrefValue} This usually means that it contains unexpected characters. Exception: {e}.");
             }
 
             return dentitizedHref;
