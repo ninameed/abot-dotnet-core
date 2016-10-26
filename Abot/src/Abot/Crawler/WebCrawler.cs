@@ -963,7 +963,8 @@ namespace Abot.Crawler
             _logger.LogInformation("Configuration Values:");
 
             var indentString = new string(' ', 2);
-            string abotVersion = Assembly.GetAssembly(this.GetType()).GetName().Version.ToString();
+            
+            string abotVersion = typeof(WebCrawler).GetTypeInfo().Assembly.GetName().Version.ToString();
             _logger.LogInformation($"{indentString}Abot Version: {abotVersion}");
             foreach (PropertyInfo property in config.GetType().GetProperties())
             {
