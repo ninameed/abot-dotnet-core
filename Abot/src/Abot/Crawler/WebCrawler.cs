@@ -10,6 +10,7 @@ using Abot.Poco;
 using Abot.Util;
 using Microsoft.Extensions.Logging;
 using Timer = System.Threading.Timer;
+using AutoMapper;
 
 namespace Abot.Crawler
 {
@@ -851,7 +852,10 @@ namespace Abot.Crawler
             //CrawledPage crawledPage = await _pageRequester.MakeRequestAsync(pageToCrawl.Uri, ShouldDownloadPageContent);
 
             dynamic combinedPageBag = this.CombinePageBags(pageToCrawl.PageBag, crawledPage.PageBag);
-            Mapper.CreateMap<PageToCrawl, CrawledPage>();
+            Mapper.Initialize(cfg =>
+                {
+                    cfg.CreateMap<PageToCrawl, CrawledPage>();
+                });
             Mapper.Map(pageToCrawl, crawledPage);
             crawledPage.PageBag = combinedPageBag;
 
