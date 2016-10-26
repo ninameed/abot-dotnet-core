@@ -11,7 +11,8 @@
     "System.Net.Http": "4.1.0",
     "NRobotsCore": "1.1.2",
     "AutoMapper": "5.1.1",
-    "System.Reflection.TypeExtensions": "4.1.0"
+    "System.Reflection.TypeExtensions": "4.1.0",
+    "System.Threading.ThreadPool": "4.0.10"
   },
 
   "frameworks": { 
