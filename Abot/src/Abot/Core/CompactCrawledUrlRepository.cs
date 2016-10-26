@@ -49,7 +49,7 @@ namespace Abot.Core
         {
             using (var md5 = MD5.Create())
             {
-                return md5.ComputeHash(Encoding.Default.GetBytes(p_String));
+                return md5.ComputeHash(Encoding.GetEncoding(0).GetBytes(p_String));
             }
         }
     }
