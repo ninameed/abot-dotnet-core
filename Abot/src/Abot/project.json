@@ -9,7 +9,8 @@
     "System.Collections.Specialized": "4.0.1",
     "System.Dynamic.Runtime": "4.0.11",
     "System.Net.Http": "4.1.0",
-    "NRobotsCore": "1.1.2"
+    "NRobotsCore": "1.1.2",
+    "AutoMapper": "5.1.1"
   },
 
   "frameworks": { 
