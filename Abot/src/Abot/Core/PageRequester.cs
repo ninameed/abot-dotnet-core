@@ -27,7 +27,7 @@ namespace Abot.Core
         protected CrawlConfiguration _config;
         protected IWebContentExtractor _extractor;
         protected CookieContainer _cookieContainer = new CookieContainer();
-        protected HttpClientHandler _httpClientHandler;
+        protected HttpMessageHandler _httpClientHandler;
         protected HttpClient _httpClient;
 
         public PageRequester(CrawlConfiguration config)
@@ -42,11 +42,6 @@ namespace Abot.Core
                 throw new ArgumentNullException(nameof(config));
 
             _config = config;
-
-            //TODO find the .net core equivalent
-            //http://stackoverflow.com/questions/36398474/servicepointmanager-defaultconnectionlimit-in-net-core
-            //if (_config.HttpServicePointConnectionLimit > 0)
-            //    ServicePointManager.DefaultConnectionLimit = _config.HttpServicePointConnectionLimit;
 
             _extractor = contentExtractor ?? new WebContentExtractor();
 
@@ -121,27 +116,28 @@ namespace Abot.Core
         }
 
         //Do not mark as virtual, could cause issues in inheritance constructoring calling
-        private HttpClientHandler BuildHttpClientHandler()
+        private HttpMessageHandler BuildHttpClientHandler()
         {
+#if NETSTANDARD1_6
             var handler = new HttpClientHandler();
+#elif NET46
+            var handler = new WebRequestHandler();
+#endif
 
             handler.AllowAutoRedirect = _config.IsHttpRequestAutoRedirectsEnabled;
             if (_config.HttpRequestMaxAutoRedirects > 0)
             {
                 handler.MaxAutomaticRedirections = _config.HttpRequestMaxAutoRedirects;
             }
-            if (!_config.IsSslCertificateValidationEnabled)
-            {
-                handler.ServerCertificateCustomValidationCallback = (sender, certificate, chain, sslPolicyErrors) => true;
-            }
-
             if (_config.IsHttpRequestAutomaticDecompressionEnabled)
             {
                 handler.AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate;
             }
             //http://stackoverflow.com/questions/13318102/struggling-trying-to-get-cookie-out-of-response-with-httpclient-in-net-4-5
             if (_config.IsSendingCookiesEnabled)
+            {
                 handler.CookieContainer = _cookieContainer;
+            }
 
             //Supposedly this does not work... https://github.com/sjdirect/abot/issues/122
             //if (_config.IsAlwaysLogin)
@@ -150,11 +146,35 @@ namespace Abot.Core
             //    handler.UseDefaultCredentials = false;
             //}
 
+#if NETSTANDARD1_6
+
+            if (!_config.IsSslCertificateValidationEnabled)
+            {
+                handler.ServerCertificateCustomValidationCallback = (sender, certificate, chain, sslPolicyErrors) => true;
+            }
+
+            //TODO find the .net core equivalent
+            //http://stackoverflow.com/questions/36398474/servicepointmanager-defaultconnectionlimit-in-net-core
+            //if (_config.HttpServicePointConnectionLimit > 0)
+            //    ServicePointManager.DefaultConnectionLimit = _config.HttpServicePointConnectionLimit;
+
+#elif NET46
+
+            if (!_config.IsSslCertificateValidationEnabled)
+            {
+                handler.ServerCertificateValidationCallback = (sender, certificate, chain, sslPolicyErrors) => true;
+            }
+
+            if (_config.HttpServicePointConnectionLimit > 0)
+            {
+                ServicePointManager.DefaultConnectionLimit = _config.HttpServicePointConnectionLimit;
+            }
+#endif
             return handler;
         }
 
         //Do not mark as virtual, could cause issues in inheritance constructoring calling
-        private HttpClient BuildHttpClient(HttpClientHandler httpHandler)
+        private HttpClient BuildHttpClient(HttpMessageHandler httpHandler)
         {
             var httpClient = new HttpClient(httpHandler);
             httpClient.DefaultRequestHeaders.TryAddWithoutValidation("Accept", "*/*");

@@ -7,7 +7,6 @@
     "Microsoft.Extensions.Logging": "1.0.0",
     "NETStandard.Library": "1.6.0",
     "System.Collections.Specialized": "4.0.1",
-    "System.Dynamic.Runtime": "4.0.11",
     "System.Net.Http": "4.1.0",
     "NRobotsCore": "1.1.2",
     "AutoMapper": "5.1.1",
@@ -16,9 +15,14 @@
     "System.Threading.Thread": "4.0.0"
   },
 
-  "frameworks": { 
+  "frameworks": {
     "netstandard1.6": {
       "imports": "dnxcore50"
+    },
+    "net46": {
+      "dependencies": {
+        "Microsoft.Net.Http": "2.2.22"
+      }
     }
   }
 }

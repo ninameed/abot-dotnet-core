@@ -20,7 +20,7 @@ namespace Abot.Util
         bool IsSpaceAvailable(int sizeInMb);
     }
 
-#if NET452
+#if NET46
     public class MemoryManager : IMemoryManager
     {
         static ILogger _logger = new LoggerFactory().CreateLogger("AbotLogger");

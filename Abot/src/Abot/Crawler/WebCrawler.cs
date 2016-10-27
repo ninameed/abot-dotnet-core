@@ -176,7 +176,7 @@ namespace Abot.Crawler
             if (_crawlContext.CrawlConfiguration.MaxMemoryUsageInMb > 0
                 || _crawlContext.CrawlConfiguration.MinAvailableMemoryRequiredInMb > 0)
             {
-#if NET452
+#if NET46
                 _memoryManager = memoryManager ?? new MemoryManager(new CachedMemoryMonitor(new GcMemoryMonitor(), _crawlContext.CrawlConfiguration.MaxMemoryUsageCacheTimeInSeconds));
 #else
                 _memoryManager = memoryManager ?? new CoreMemoryManager(new CachedMemoryMonitor(new GcMemoryMonitor(), _crawlContext.CrawlConfiguration.MaxMemoryUsageCacheTimeInSeconds));
@@ -531,7 +531,7 @@ namespace Abot.Crawler
 
             if (!_memoryManager.IsSpaceAvailable(_crawlContext.CrawlConfiguration.MinAvailableMemoryRequiredInMb))
             {
-#if NET452
+#if NET46
                 throw new InsufficientMemoryException($"Process does not have the configured [{_crawlContext.CrawlConfiguration.MinAvailableMemoryRequiredInMb}mb] of available memory to crawl site [{_crawlContext.RootUri}]. This is configurable through the minAvailableMemoryRequiredInMb in app.conf or CrawlConfiguration.MinAvailableMemoryRequiredInMb.");
 #else
                 throw new OutOfMemoryException($"Process does not have the configured [{_crawlContext.CrawlConfiguration.MinAvailableMemoryRequiredInMb}mb] of available memory to crawl site [{_crawlContext.RootUri}]. This is configurable through the minAvailableMemoryRequiredInMb in app.conf or CrawlConfiguration.MinAvailableMemoryRequiredInMb.");
@@ -563,7 +563,7 @@ namespace Abot.Crawler
                 _memoryManager = null;
 
                 string message = $"Process is using [{currentMemoryUsage}mb] of memory which is above the max configured of [{_crawlContext.CrawlConfiguration.MaxMemoryUsageInMb}mb] for site [{_crawlContext.RootUri}]. This is configurable through the maxMemoryUsageInMb in app.conf or CrawlConfiguration.MaxMemoryUsageInMb.";
-#if NET452
+#if NET46
                 _crawlResult.ErrorException = new InsufficientMemoryException(message);
 #else
                 _crawlResult.ErrorException = new OutOfMemoryException(message);
