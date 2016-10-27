@@ -48,10 +48,6 @@ namespace Abot.Core
             //if (_config.HttpServicePointConnectionLimit > 0)
             //    ServicePointManager.DefaultConnectionLimit = _config.HttpServicePointConnectionLimit;
 
-            //if (!_config.IsSslCertificateValidationEnabled)
-            //    ServicePointManager.ServerCertificateValidationCallback +=
-            //        (sender, certificate, chain, sslPolicyErrors) => true;
-
             _extractor = contentExtractor ?? new WebContentExtractor();
 
             _httpClientHandler = BuildHttpClientHandler();
@@ -131,11 +127,18 @@ namespace Abot.Core
 
             handler.AllowAutoRedirect = _config.IsHttpRequestAutoRedirectsEnabled;
             if (_config.HttpRequestMaxAutoRedirects > 0)
+            {
                 handler.MaxAutomaticRedirections = _config.HttpRequestMaxAutoRedirects;
+            }
+            if (!_config.IsSslCertificateValidationEnabled)
+            {
+                handler.ServerCertificateCustomValidationCallback = (sender, certificate, chain, sslPolicyErrors) => true;
+            }
 
             if (_config.IsHttpRequestAutomaticDecompressionEnabled)
+            {
                 handler.AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate;
-
+            }
             //http://stackoverflow.com/questions/13318102/struggling-trying-to-get-cookie-out-of-response-with-httpclient-in-net-4-5
             if (_config.IsSendingCookiesEnabled)
                 handler.CookieContainer = _cookieContainer;
