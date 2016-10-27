@@ -11,6 +11,7 @@ using Abot.Util;
 using Microsoft.Extensions.Logging;
 using Timer = System.Threading.Timer;
 using AutoMapper;
+using Microsoft.Extensions.Configuration;
 
 namespace Abot.Crawler
 {
@@ -165,7 +166,7 @@ namespace Abot.Crawler
             IMemoryManager memoryManager)
         {
             _crawlContext = new CrawlContext();
-            _crawlContext.CrawlConfiguration = crawlConfiguration ?? new CrawlConfiguration();//GetCrawlConfigurationFromConfigFile();
+            _crawlContext.CrawlConfiguration = crawlConfiguration ?? GetCrawlConfigurationFromConfigFile();
             CrawlBag = _crawlContext.CrawlBag;
 
             _threadManager = threadManager ?? new TaskThreadManager(_crawlContext.CrawlConfiguration.MaxConcurrentThreads > 0 ? _crawlContext.CrawlConfiguration.MaxConcurrentThreads : Environment.ProcessorCount);
@@ -267,7 +268,23 @@ namespace Abot.Crawler
             return _crawlResult;
         }
 
-#region Synchronous Events
+        private CrawlConfiguration GetCrawlConfigurationFromConfigFile()
+        {
+            var builder = new ConfigurationBuilder();
+            builder.AddJsonFile("appsettings.json");
+            var cr = builder.Build();
+
+            AbotConfigurationSectionHandler configFromFile = new AbotConfigurationSectionHandler(cr);
+
+            //TODO check sections exist
+            //if (configFromFile == null)
+            //    throw new InvalidOperationException("abot config section was NOT found");
+
+            _logger.LogDebug("abot config section was found");
+            return configFromFile.Convert();
+        }
+
+        #region Synchronous Events
 
         /// <summary>
         /// Synchronous event that is fired before a page is crawled.
@@ -347,7 +364,7 @@ namespace Abot.Crawler
 
 #endregion
 
-#region Asynchronous Events
+        #region Asynchronous Events
 
         /// <summary>
         /// Asynchronous event that is fired before a page is crawled.
