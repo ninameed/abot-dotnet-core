@@ -81,19 +81,6 @@ namespace Abot.Core
                 crawledPage.RequestStarted = DateTime.Now;
                 httpResponseMessage = await _httpClient.GetAsync(uri);
             }
-            //catch (HttpRequestException hre)
-            //{
-            //http://stackoverflow.com/questions/22382373/httprequestexception-vs-webexception
-            //}
-            //catch (IOException ioe)
-            //{
-
-            //}
-            catch (WebException e)
-            {
-                crawledPage.WebException = e;
-                _logger.LogDebug($"Error occurred requesting url [{uri.AbsoluteUri}]", e);
-            }
             catch (Exception e)
             {
                 _logger.LogDebug($"Error occurred requesting url [{uri.AbsoluteUri}]", e);
@@ -119,8 +106,14 @@ namespace Abot.Core
                             _logger.LogDebug($"Links on page [{crawledPage.Uri.AbsoluteUri}] not crawled, [{shouldDownloadContentDecision.Reason}]");
                         }
 
-                        //response.Close();//Should already be closed by _extractor but just being safe
+                        httpResponseMessage.EnsureSuccessStatusCode();
+                        httpResponseMessage.Dispose();//Should already be closed by _extractor but just being safe
                     }
+                }
+                catch (HttpRequestException e)
+                {
+                    crawledPage.HttpRequestException = e;
+                    _logger.LogDebug($"Error occurred finalizing requesting url [{uri.AbsoluteUri}]", e);
                 }
                 catch (Exception e)
                 {

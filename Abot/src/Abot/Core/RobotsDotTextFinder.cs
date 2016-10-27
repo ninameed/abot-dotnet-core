@@ -41,7 +41,7 @@ namespace Abot.Core
 
             var robotsUri = new Uri(rootUri, "/robots.txt");
             var page = await _pageRequester.MakeRequestAsync(robotsUri);
-            if (page == null || page.WebException != null || page.HttpWebResponse == null || page.HttpWebResponse.StatusCode != HttpStatusCode.OK)
+            if (page == null || page.HttpRequestException != null || page.HttpWebResponse == null || page.HttpWebResponse.StatusCode != HttpStatusCode.OK)
             {
                 _logger.LogDebug($"Did not find robots.txt file at [{robotsUri}]");
                 return null;

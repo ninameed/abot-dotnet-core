@@ -142,8 +142,8 @@ namespace Abot.Core
             if (crawlContext == null)
                 return new CrawlDecision { Allow = false, Reason = "Null crawl context" };
 
-            if (crawledPage.WebException == null)
-                return new CrawlDecision { Allow = false, Reason = "WebException did not occur"};
+            if (crawledPage.HttpRequestException == null)
+                return new CrawlDecision { Allow = false, Reason = "HttpRequestException did not occur" };
            
             if (crawlContext.CrawlConfiguration.MaxRetryCount < 1)
                 return new CrawlDecision { Allow = false, Reason = "MaxRetryCount is less than 1"};
