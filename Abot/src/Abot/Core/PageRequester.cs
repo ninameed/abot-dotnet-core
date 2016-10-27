@@ -89,7 +89,7 @@ namespace Abot.Core
                     crawledPage.RequestCompleted = DateTime.Now;
                     if (httpResponseMessage != null)
                     {
-                        crawledPage.HttpWebResponse = new HttpWebResponseWrapper(httpResponseMessage);
+                        crawledPage.HttpWebResponse = new HttpWebResponseWrapper(httpResponseMessage, _cookieContainer);
                         var shouldDownloadContentDecision = shouldDownloadContent(crawledPage);
                         if (shouldDownloadContentDecision.Allow)
                         {

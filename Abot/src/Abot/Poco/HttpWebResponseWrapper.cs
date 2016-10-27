@@ -5,7 +5,9 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace Abot.Poco
 {
@@ -17,7 +19,6 @@ namespace Abot.Poco
     /// </remarks>
     public class HttpWebResponseWrapper
     {
-        //private readonly HttpWebResponse _internalResponse;
         private readonly HttpResponseMessage _internalResponse;
         private readonly byte[] _content;
         private readonly Lazy<Stream> _contentStream;
@@ -26,48 +27,56 @@ namespace Abot.Poco
         #region Constructors
 
         /// <summary>Constructs a response based on the received system http response.</summary>
-        public HttpWebResponseWrapper(HttpResponseMessage response)
+        public HttpWebResponseWrapper(HttpResponseMessage response, CookieContainer cookieContainer)
         {
             _internalResponse = response;
 
             if (response == null)
                 return;
-            //http://stackoverflow.com/questions/13318102/struggling-trying-to-get-cookie-out-of-response-with-httpclient-in-net-4-5
-            StatusCode = response.StatusCode;
-            ContentType = response.ContentType;
-            ContentLength = response.ContentLength;
-            Headers = response.Headers;
-            CharacterSet = response.CharacterSet;
-            ContentEncoding = response.ContentEncoding;
-            Cookies = response.Cookies;
-            IsFromCache = response.IsFromCache;
-            LastModified = GetLastModified(response);
-            Method = response.Method;
-            ProtocolVersion = response.ProtocolVersion;
-            ResponseUri = response.ResponseUri;
-            Server = response.Server;
-            StatusDescription = response.StatusDescription;
 
-            if (!IsMutuallyAuthenticatedImplemented.HasValue)
-            {
-                try
-                {
-                    IsMutuallyAuthenticated = response.IsMutuallyAuthenticated;
-                    IsMutuallyAuthenticatedImplemented = true;
-                }
-                catch (NotImplementedException e)
-                {
-                    IsMutuallyAuthenticatedImplemented = false;
-                }
-            }
-            IsMutuallyAuthenticated = IsMutuallyAuthenticatedImplemented.Value && response.IsMutuallyAuthenticated;
+            StatusCode = response.StatusCode;
+            ContentType = response.Content.Headers.ContentType.ToString();
+            ContentLength = response.Content.Headers.ContentLength.Value;
+            Headers = response.Headers.ToList();
+            //CharacterSet = response.CharacterSet;
+            ContentEncoding = response.Content.Headers.ContentEncoding.FirstOrDefault();
+            Cookies = cookieContainer.GetCookies(response.RequestMessage.RequestUri);
+            //IsFromCache = response.IsFromCache;
+            LastModified = GetLastModified(response);
+            Method = response.RequestMessage.Method.ToString();
+            ProtocolVersion = response.Version;
+            ResponseUri = response.RequestMessage.RequestUri;
+            Server = response.Headers.Server.ToString();
+            StatusDescription = response.ReasonPhrase;
+
+            //if (!IsMutuallyAuthenticatedImplemented.HasValue)
+            //{
+            //    try
+            //    {
+            //        IsMutuallyAuthenticated = response.IsMutuallyAuthenticated;
+            //        IsMutuallyAuthenticatedImplemented = true;
+            //    }
+            //    catch (NotImplementedException e)
+            //    {
+            //        IsMutuallyAuthenticatedImplemented = false;
+            //    }
+            //}
+            //IsMutuallyAuthenticated = IsMutuallyAuthenticatedImplemented.Value && response.IsMutuallyAuthenticated;
         }
 
-        private static DateTime GetLastModified(HttpWebResponse response)
+        private static DateTime GetLastModified(HttpResponseMessage response)
         {
             try
             {
-                return response.LastModified;
+                var lm = response.Content.Headers.LastModified;
+                if (lm.HasValue)
+                {
+                    return lm.Value.DateTime; //Last-Modified
+                }
+                else
+                {
+                    return DateTime.MinValue;
+                }
             }
             catch (ProtocolViolationException)
             {
@@ -77,10 +86,10 @@ namespace Abot.Poco
 
         /// <summary>Constructs a response based on custom parameters.</summary>
         /// <remarks>Recieves parameters neccesarily set for Abot to work.</remarks>
-        public HttpWebResponseWrapper(HttpStatusCode statusCode, string contentType, byte[] content, NameValueCollection headers)
+        public HttpWebResponseWrapper(HttpStatusCode statusCode, string contentType, byte[] content, IEnumerable<KeyValuePair<string, IEnumerable<string>>> headers)
         {
             StatusCode = statusCode;
-            Headers = headers;
+            Headers = headers.ToList();
             ContentType = contentType;
             ContentLength = content != null ? content.Length : 0;
             _content = content;
@@ -101,17 +110,17 @@ namespace Abot.Poco
         /// <summary>Server designated length of content in bytes</summary>
         public long ContentLength { get; set; }
         /// <summary>Collection of headers in the response</summary>
-        public NameValueCollection Headers { get; set; }
+        public List<KeyValuePair<string, IEnumerable<string>>> Headers { get; set; }
         /// <summary>Gets the character set of the response.</summary>
-        public string CharacterSet { get; set; }
+        //public string CharacterSet { get; set; }
         /// <summary>Gets the method that is used to encode the body of the response.</summary>
         public string ContentEncoding { get; set; }
         /// <summary>Gets or sets the cookies that are associated with this response.</summary>
         public CookieCollection Cookies { get; set; }
         /// <summary>Was the response generated from the local cache?</summary>
-        public bool IsFromCache { get; set; }
+        //public bool IsFromCache { get; set; }
         /// <summary>Gets a System.Boolean value that indicates whether both client and server were authenticated.</summary>
-        public bool IsMutuallyAuthenticated { get; set; }
+        //public bool IsMutuallyAuthenticated { get; set; }
         /// <summary>Gets the last date and time that the contents of the response were modified.</summary>
         public DateTime LastModified { get; set; }
         /// <summary>Gets the method that is used to return the response.</summary>
@@ -130,19 +139,31 @@ namespace Abot.Poco
         #region Stream Methods
 
         /// <summary>Gets the actual response data.</summary>
-        public Stream GetResponseStream()
+        public async Task<Stream> GetResponseStream()
         {
             return _internalResponse != null ?
-                _internalResponse.GetResponseStream() :
+                await _internalResponse.Content.ReadAsStreamAsync() :
                 _contentStream.Value;
         }
 
         /// <summary>Gets the header with the given name.</summary>
         public string GetResponseHeader(string header)
         {
-            return Headers != null ? Headers[header] : null;
+            return Headers.FirstOrDefault(x => x.Key == header).Value?.FirstOrDefault();
         }
 
+        public void AddResponseHeader(string key, string value)
+        {
+            if (Headers != null)
+            {
+                Headers.RemoveAll(x => x.Key == key);
+            }
+            else
+            {
+                Headers = new List<KeyValuePair<string, IEnumerable<string>>>();
+            }
+            Headers.Add(new KeyValuePair<string, IEnumerable<string>>(key, new List<string> { value }));
+        }
         #endregion
     }
 }
