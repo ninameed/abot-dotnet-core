@@ -20,7 +20,7 @@ namespace Abot.Util
         bool IsSpaceAvailable(int sizeInMb);
     }
 
-    
+#if NET452
     public class MemoryManager : IMemoryManager
     {
         static ILogger _logger = new LoggerFactory().CreateLogger("AbotLogger");
@@ -78,4 +78,49 @@ namespace Abot.Util
             _memoryMonitor.Dispose();
         }
     }
+#endif
+
+#if NETSTANDARD1_6
+    public class CoreMemoryManager : IMemoryManager
+    {
+        static ILogger _logger = new LoggerFactory().CreateLogger("AbotLogger");
+        IMemoryMonitor _memoryMonitor;
+
+        public CoreMemoryManager(IMemoryMonitor memoryMonitor)
+        {
+            if (memoryMonitor == null)
+                throw new ArgumentNullException(nameof(memoryMonitor));
+
+            _memoryMonitor = memoryMonitor;
+        }
+
+        public virtual bool IsCurrentUsageAbove(int sizeInMb)
+        {
+            return GetCurrentUsageInMb() > sizeInMb;
+        }
+
+        public virtual bool IsSpaceAvailable(int sizeInMb)
+        {
+            if (sizeInMb < 1)
+                return true;
+
+            var isAvailable = true;
+
+            //TODO use MemoryFailPoint if it is available in net core
+            _logger.LogWarning("MemoryFailPoint is not implemented on this platform. The MemoryManager.IsSpaceAvailable() will just return true.");
+
+            return isAvailable;
+        }
+
+        public virtual int GetCurrentUsageInMb()
+        {
+            return _memoryMonitor.GetCurrentUsageInMb();
+        }
+
+        public void Dispose()
+        {
+            _memoryMonitor.Dispose();
+        }
+    }
+#endif
 }
