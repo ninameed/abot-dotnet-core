@@ -276,11 +276,6 @@ namespace Abot.Crawler
 
             AbotConfigurationSectionHandler configFromFile = new AbotConfigurationSectionHandler(cr);
 
-            //TODO check sections exist
-            //if (configFromFile == null)
-            //    throw new InvalidOperationException("abot config section was NOT found");
-
-            _logger.LogDebug("abot config section was found");
             return configFromFile.Convert();
         }
 

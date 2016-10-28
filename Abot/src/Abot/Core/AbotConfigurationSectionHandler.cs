@@ -1,16 +1,21 @@
 ﻿using Abot.Poco;
 using Microsoft.Extensions.Configuration;
 using System;
+using System.Linq;
 
 namespace Abot.Core
 {
     public class AbotConfigurationSectionHandler 
     {
-        private IConfigurationRoot config;
+        private IConfigurationSection config;
         public AbotConfigurationSectionHandler(IConfigurationRoot cr)
         {
-            //TODO should select "abot" section?
-            config = cr;
+            if(cr.GetChildren().SingleOrDefault(c=>c.Key == "abot") == null)
+            {
+                throw new InvalidOperationException("abot config section was NOT found");
+            }
+
+            config = cr.GetSection("abot");
         }
 
         public CrawlBehaviorElement CrawlBehavior
@@ -50,7 +55,7 @@ namespace Abot.Core
     public class AuthorizationElement
     {
         private IConfigurationSection config;
-        public AuthorizationElement(IConfigurationRoot cr)
+        public AuthorizationElement(IConfigurationSection cr)
         {
             config = cr.GetSection("Authorization");
         }
@@ -81,7 +86,7 @@ namespace Abot.Core
     public class PolitenessElement 
     {
         private IConfigurationSection config;
-        public PolitenessElement(IConfigurationRoot cr)
+        public PolitenessElement(IConfigurationSection cr)
         {
             config = cr.GetSection("Politeness");
         }
@@ -130,7 +135,7 @@ namespace Abot.Core
     public class CrawlBehaviorElement
     {
         private IConfigurationSection config;
-        public CrawlBehaviorElement(IConfigurationRoot cr)
+        public CrawlBehaviorElement(IConfigurationSection cr)
         {
             config = cr.GetSection("CrawlBehavior");
         }
