@@ -13,14 +13,14 @@ namespace Abot.Core
 {
     public interface IWebContentExtractor : IDisposable
     {
-        Task<PageContent> GetContent(HttpResponseMessage httpResponseMessage);
+        Task<PageContent> GetContentAsync(HttpResponseMessage httpResponseMessage);
     }
 
     public class WebContentExtractor : IWebContentExtractor
     {
         static ILogger _logger = new LoggerFactory().CreateLogger("AbotLogger");
 
-        public virtual async Task<PageContent> GetContent(HttpResponseMessage httpResponseMessage)
+        public virtual async Task<PageContent> GetContentAsync(HttpResponseMessage httpResponseMessage)
         {
             using (var memoryStream = await GetRawData(httpResponseMessage))
             {

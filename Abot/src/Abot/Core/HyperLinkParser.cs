@@ -79,7 +79,7 @@ namespace Abot.Core
 
             //Use the uri of the page that actually responded to the request instead of crawledPage.Uri (Issue 82).
             //Using HttpWebRequest.Address instead of HttpWebResonse.ResponseUri since this is the best practice and mentioned on http://msdn.microsoft.com/en-us/library/system.net.httpwebresponse.responseuri.aspx
-            var uriToUse = crawledPage.HttpWebRequest.RequestUri ?? crawledPage.Uri;
+            var uriToUse = crawledPage.HttpRequestMessage.RequestUri ?? crawledPage.Uri;
 
             //If html base tag exists use it instead of page uri for relative links
             var baseHref = GetBaseHrefValue(crawledPage);

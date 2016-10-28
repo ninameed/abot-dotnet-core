@@ -4,6 +4,7 @@ using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
+using System.Net.Http.Headers;
 
 namespace Abot.Core
 {
@@ -66,11 +67,13 @@ namespace Abot.Core
                 throw new ArgumentNullException(nameof(uri));
 
             var crawledPage = new CrawledPage(uri);
+            HttpRequestMessage request = null;
             HttpResponseMessage httpResponseMessage = null;
             try
             {
+                request = BuildRequestObject(_httpClient, uri);
                 crawledPage.RequestStarted = DateTime.Now;
-                httpResponseMessage = await _httpClient.GetAsync(uri);
+                httpResponseMessage = await _httpClient.SendAsync(request);
             }
             catch (Exception e)
             {
@@ -80,7 +83,7 @@ namespace Abot.Core
             {
                 try
                 {
-                    crawledPage.HttpResponseMessage = httpResponseMessage;
+                    crawledPage.HttpRequestMessage = request;
                     crawledPage.RequestCompleted = DateTime.Now;
                     if (httpResponseMessage != null)
                     {
@@ -89,7 +92,7 @@ namespace Abot.Core
                         if (shouldDownloadContentDecision.Allow)
                         {
                             crawledPage.DownloadContentStarted = DateTime.Now;
-                            crawledPage.Content = await _extractor.GetContent(httpResponseMessage);
+                            crawledPage.Content = await _extractor.GetContentAsync(httpResponseMessage);
                             crawledPage.DownloadContentCompleted = DateTime.Now;
                         }
                         else
@@ -113,6 +116,27 @@ namespace Abot.Core
             }
 
             return crawledPage;
+        }
+
+        protected virtual HttpRequestMessage BuildRequestObject(HttpClient c, Uri uri)
+        {
+            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, uri);
+            request.Headers.UserAgent.ParseAdd(_config.UserAgentString);
+            request.Headers.Accept.ParseAdd("*/*");
+
+            if (_config.IsHttpRequestAutomaticDecompressionEnabled)
+                request.Headers.AcceptEncoding.ParseAdd("gzip, deflate");
+
+            if (_config.HttpRequestTimeoutInSeconds > 0)
+                c.Timeout = TimeSpan.FromSeconds(_config.HttpRequestTimeoutInSeconds);
+
+            if (_config.IsAlwaysLogin)
+            {
+                string credentials = Convert.ToBase64String(System.Text.Encoding.ASCII.GetBytes(_config.LoginUser + ":" + _config.LoginPassword));
+                request.Headers.Authorization = new AuthenticationHeaderValue("Basic", credentials);
+            }
+
+            return request;
         }
 
         //Do not mark as virtual, could cause issues in inheritance constructoring calling
