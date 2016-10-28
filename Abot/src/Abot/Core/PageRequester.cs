@@ -118,7 +118,7 @@ namespace Abot.Core
             return crawledPage;
         }
 
-        protected virtual HttpRequestMessage BuildRequestObject(HttpClient c, Uri uri)
+        private HttpRequestMessage BuildRequestObject(HttpClient c, Uri uri)
         {
             HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, uri);
             request.Headers.UserAgent.ParseAdd(_config.UserAgentString);
