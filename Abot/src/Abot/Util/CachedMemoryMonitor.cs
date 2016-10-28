@@ -24,7 +24,7 @@ namespace Abot.Util
 
             UpdateCurrentUsageValue();
 
-            _usageRefreshTimer = new Timer(UpdateCurrentUsageValue, null, 0, cacheExpirationInSeconds * 1000);
+            _usageRefreshTimer = new Timer(UpdateCurrentUsageValue, null, cacheExpirationInSeconds * 1000, cacheExpirationInSeconds * 1000);
         }
 
         protected virtual void UpdateCurrentUsageValue(object state = null)
