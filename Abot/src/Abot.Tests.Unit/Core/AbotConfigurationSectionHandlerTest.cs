@@ -61,12 +61,9 @@ namespace Abot.Tests.Unit.Core
             Assert.AreEqual(55, _uut.Politeness.MinCrawlDelayPerDomainMilliSeconds);
             Assert.AreEqual(5, _uut.Politeness.MaxRobotsDotTextCrawlDelayInSeconds);
 
-            //TODO: no config extensions yet
-            //Assert.IsNotNull(_uut.ExtensionValues);
-            //Assert.AreEqual("key1", _uut.ExtensionValues[0].Key);
-            //Assert.AreEqual("key2", _uut.ExtensionValues[1].Key);
-            //Assert.AreEqual("value1", _uut.ExtensionValues[0].Value);
-            //Assert.AreEqual("value2", _uut.ExtensionValues[1].Value);
+            Assert.IsNotNull(_uut.Extensions);
+            Assert.AreEqual("value1", _uut.Extensions.GetValue("key1"));
+            Assert.AreEqual("value2", _uut.Extensions.GetValue("key2"));
         }
 
         [Test]
@@ -117,10 +114,9 @@ namespace Abot.Tests.Unit.Core
             Assert.AreEqual(result.LoginPassword, _uut.Authorization.LoginPassword);
             Assert.AreEqual(result.LoginUser, _uut.Authorization.LoginUser);
 
-            //TODO: no config extensions yet
-            //Assert.IsNotNull(result.ConfigurationExtensions);
-            //Assert.AreEqual(result.ConfigurationExtensions["key1"], _uut.ExtensionValues[0].Value);
-            //Assert.AreEqual(result.ConfigurationExtensions["key2"], _uut.ExtensionValues[1].Value);
+            Assert.IsNotNull(result.ConfigurationExtensions);
+            Assert.AreEqual(result.ConfigurationExtensions["key1"], _uut.Extensions.GetValue("key1"));
+            Assert.AreEqual(result.ConfigurationExtensions["key2"], _uut.Extensions.GetValue("key2"));
         }
     }
 }

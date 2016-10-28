@@ -1,6 +1,7 @@
 ﻿using Abot.Poco;
 using Microsoft.Extensions.Configuration;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace Abot.Core
@@ -33,6 +34,11 @@ namespace Abot.Core
             get { return new AuthorizationElement(config); }
         }
 
+        public ExtensionsElement Extensions
+        {
+            get { return new ExtensionsElement(config); }
+        }
+
         public CrawlConfiguration Convert()
         {
             AutoMapper.Mapper.Initialize(cfg =>
@@ -47,7 +53,10 @@ namespace Abot.Core
             AutoMapper.Mapper.Map<CrawlBehaviorElement, CrawlConfiguration>(CrawlBehavior, config);
             AutoMapper.Mapper.Map<PolitenessElement, CrawlConfiguration>(Politeness, config);
             AutoMapper.Mapper.Map<AuthorizationElement, CrawlConfiguration>(Authorization, config);
-
+            foreach(IConfigurationSection ext in Extensions.GetAllValues())
+            {
+                config.ConfigurationExtensions.Add(ext.Key, ext.Value);
+            }
             return config;
         }
     }
@@ -271,22 +280,22 @@ namespace Abot.Core
         }
     }
 
-    public class ExtensionValueElement
+    public class ExtensionsElement
     {
         private IConfigurationSection config;
-        public ExtensionValueElement(IConfigurationRoot cr)
+        public ExtensionsElement(IConfigurationSection cr)
         {
-            config = cr.GetSection("ExtensionValue");
+            config = cr.GetSection("Extensions");
         }
 
-        public string Key
+        public IEnumerable<IConfigurationSection> GetAllValues()
         {
-            get { return config["Key"]; }
+            return config.GetChildren();
         }
 
-        public string Value
+        public string GetValue(string key)
         {
-            get { return config["Value"]; }
+            return config[key];
         }
     }
 }
