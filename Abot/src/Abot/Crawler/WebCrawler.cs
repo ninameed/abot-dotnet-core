@@ -527,7 +527,7 @@ namespace Abot.Crawler
 
                 if (_scheduler.Count > 0)
                 {
-                    _threadManager.DoWork(() => ProcessPageAsync(_scheduler.GetNext()));
+                    _threadManager.DoWork(async() => await ProcessPageAsync(_scheduler.GetNext()));
                 }
                 else if (!_threadManager.HasRunningThreads())
                 {
@@ -701,7 +701,7 @@ namespace Abot.Crawler
                     _scheduler.Add(crawledPage);
                 }   
             }
-            catch (OperationCanceledException oce)
+            catch (OperationCanceledException)
             {
                 _logger.LogDebug($"Thread cancelled while crawling/processing page [{pageToCrawl.Uri}]");
                 throw;
@@ -875,7 +875,10 @@ namespace Abot.Crawler
             FirePageCrawlStartingEventAsync(pageToCrawl);
             FirePageCrawlStartingEvent(pageToCrawl);
 
-            if (pageToCrawl.IsRetry){ WaitMinimumRetryDelay(pageToCrawl); }
+            if (pageToCrawl.IsRetry)
+            {
+                await WaitMinimumRetryDelayAsync(pageToCrawl);
+            }
             
             pageToCrawl.LastRequest = DateTime.Now;
 
@@ -918,7 +921,6 @@ namespace Abot.Crawler
                 return;
             }
 
-            var domainCount = 0;
             Interlocked.Increment(ref _crawlContext.CrawledCount);
             _crawlContext.CrawlCountByDomain.AddOrUpdate(pageToCrawl.Uri.Authority, 1, (key, oldValue) => oldValue + 1);
         }
@@ -1023,7 +1025,7 @@ namespace Abot.Crawler
             }
         }
 
-        protected virtual async Task WaitMinimumRetryDelay(PageToCrawl pageToCrawl)
+        protected virtual async Task WaitMinimumRetryDelayAsync(PageToCrawl pageToCrawl)
         {
             //TODO No unit tests cover these lines
             if (pageToCrawl.LastRequest == null)
