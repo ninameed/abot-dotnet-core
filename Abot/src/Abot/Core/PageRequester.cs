@@ -177,10 +177,10 @@ namespace Abot.Core
                 handler.ServerCertificateCustomValidationCallback = (sender, certificate, chain, sslPolicyErrors) => true;
             }
 
-            //TODO find the .net core equivalent
-            //http://stackoverflow.com/questions/36398474/servicepointmanager-defaultconnectionlimit-in-net-core
-            //if (_config.HttpServicePointConnectionLimit > 0)
-            //    ServicePointManager.DefaultConnectionLimit = _config.HttpServicePointConnectionLimit;
+            if (_config.HttpServicePointConnectionLimit > 0)
+            {
+                handler.MaxConnectionsPerServer = _config.HttpServicePointConnectionLimit;
+            }
 
 #elif NET46
 
