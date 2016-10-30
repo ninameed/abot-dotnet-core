@@ -1,5 +1,6 @@
 ﻿using Abot.Core;
 using Abot.Poco;
+using Abot.Tests.Unit.Helpers;
 using NUnit.Framework;
 using System;
 using System.IO;
@@ -14,7 +15,8 @@ namespace Abot.Tests.Unit.Core
     public class WebContentExtractorTest
     {
         WebContentExtractor _uut;
-        Uri _utf8 = new Uri("http://localhost:1111/");
+        UnitTestConfig unitTestConfig = new UnitTestConfig();
+        Uri _utf8 { get { return new Uri(unitTestConfig.SiteSimulatorBaseAddress); } }
         Uri _japan = new Uri("http://aaa.jp");
         Uri _japanMetaSingleQuotes = new Uri("http://aaa2.jp");
         Uri _japanMetaDoubleQuotesAndClose = new Uri("http://aaa3.jp");

@@ -1,5 +1,6 @@
 ﻿using Abot.Core;
 using Abot.Poco;
+using Abot.Tests.Unit.Helpers;
 using HtmlAgilityPack;
 using Moq;
 using NUnit.Framework;
@@ -14,6 +15,7 @@ namespace Abot.Tests.Unit.Core
     [TestFixture]
     public class CrawlDecisionMakerTest
     {
+        UnitTestConfig unitTestConfig = new UnitTestConfig();
         CrawlDecisionMaker _unitUnderTest;
         CrawlContext _crawlContext;
         Mock<IScheduler> _fakeScheduler;
@@ -601,7 +603,7 @@ namespace Abot.Tests.Unit.Core
         [Test]
         public async Task ShouldDownloadPageContent_DownloadablePage_ReturnsTrue()
         {
-            Uri valid200StatusUri = new Uri("http://localhost:1111/");
+            Uri valid200StatusUri = new Uri(unitTestConfig.SiteSimulatorBaseAddress);
 
             CrawlDecision result = _unitUnderTest.ShouldDownloadPageContent(await new PageRequester(new CrawlConfiguration { UserAgentString = "aaa" }).MakeRequestAsync(valid200StatusUri), _crawlContext);
 
@@ -653,7 +655,7 @@ namespace Abot.Tests.Unit.Core
         [Test]
         public async Task ShouldDownloadPageContent_HttpStatusNon200_ReturnsFalse()
         {
-            Uri non200Uri = new Uri("http://localhost:1111/HttpResponse/Status403");
+            Uri non200Uri = new Uri(string.Concat(unitTestConfig.SiteSimulatorBaseAddress, "/HttpResponse/Status403"));
 
             CrawlDecision result = _unitUnderTest.ShouldDownloadPageContent(await new PageRequester(_crawlContext.CrawlConfiguration).MakeRequestAsync(non200Uri), new CrawlContext());
 
@@ -666,7 +668,7 @@ namespace Abot.Tests.Unit.Core
         [Test]
         public async Task ShouldDownloadPageContent_NonHtmlPage_ReturnsFalse()
         {
-            Uri imageUrl = new Uri("http://localhost:1111/Content/themes/base/images/ui-bg_flat_0_aaaaaa_40x100.png");
+            Uri imageUrl = new Uri(string.Concat(unitTestConfig.SiteSimulatorBaseAddress, "/Content/themes/base/images/ui-bg_flat_0_aaaaaa_40x100.png"));
 
             CrawlDecision result = _unitUnderTest.ShouldDownloadPageContent(await new PageRequester(_crawlContext.CrawlConfiguration).MakeRequestAsync(imageUrl), _crawlContext);
 
@@ -679,7 +681,7 @@ namespace Abot.Tests.Unit.Core
         [Test]
         public async Task ShouldDownloadPageContent_NonHtmlPage_DownloadableContentTypesWithSpaces_ReturnsFalse()
         {
-            Uri imageUrl = new Uri("http://localhost:1111/Content/themes/base/images/ui-bg_flat_0_aaaaaa_40x100.png");//Content type fo this link is image/png
+            Uri imageUrl = new Uri(string.Concat(unitTestConfig.SiteSimulatorBaseAddress, "/Content/themes/base/images/ui-bg_flat_0_aaaaaa_40x100.png"));//Content type fo this link is image/png
 
             _crawlContext.CrawlConfiguration.DownloadableContentTypes = "text/hmtl, ,    , application/pdf";
             CrawlDecision result = _unitUnderTest.ShouldDownloadPageContent(await new PageRequester(_crawlContext.CrawlConfiguration).MakeRequestAsync(imageUrl), _crawlContext);
@@ -693,7 +695,7 @@ namespace Abot.Tests.Unit.Core
         [Test]
         public async Task ShouldDownloadPageContent_DownloadableContenttypesWithSpaces_TrimsSpaces_ReturnsTrue()
         {
-            Uri valid200StatusUri = new Uri("http://localhost:1111/");//Content type fo this link is text/html
+            Uri valid200StatusUri = new Uri(unitTestConfig.SiteSimulatorBaseAddress);//Content type fo this link is text/html
             CrawlConfiguration crawlConfiguration = new CrawlConfiguration
             {
                 UserAgentString = "aaa",
@@ -712,7 +714,7 @@ namespace Abot.Tests.Unit.Core
         [Test]
         public async Task ShouldDownloadPageContent_AboveMaxPageSize_ReturnsFalse()
         {
-            Uri valid200StatusUri = new Uri("http://localhost:1111/");
+            Uri valid200StatusUri = new Uri(unitTestConfig.SiteSimulatorBaseAddress);
 
             CrawlDecision result = _unitUnderTest.ShouldDownloadPageContent(await new PageRequester(_crawlContext.CrawlConfiguration).MakeRequestAsync(valid200StatusUri), 
                 new CrawlContext
@@ -734,7 +736,7 @@ namespace Abot.Tests.Unit.Core
         [Test]
         public async Task ShouldDownloadPageContent_MaxPageSizeInBytesZero_ReturnsTrue()
         {
-            Uri valid200StatusUri = new Uri("http://localhost:1111/");
+            Uri valid200StatusUri = new Uri(unitTestConfig.SiteSimulatorBaseAddress);
 
             CrawlDecision result = _unitUnderTest.ShouldDownloadPageContent(await new PageRequester(_crawlContext.CrawlConfiguration).MakeRequestAsync(valid200StatusUri),
                 new CrawlContext

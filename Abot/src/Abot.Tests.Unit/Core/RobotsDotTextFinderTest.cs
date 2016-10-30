@@ -1,5 +1,6 @@
 ﻿using Abot.Core;
 using Abot.Poco;
+using Abot.Tests.Unit.Helpers;
 using Moq;
 using NUnit.Framework;
 using System;
@@ -18,9 +19,10 @@ namespace Abot.Tests.Unit.Core
         [TestFixtureSetUp]
         public async Task TestFixtureSetup()
         {
+            UnitTestConfig unitTestConfig = new UnitTestConfig();
             PageRequester pageRequster = new PageRequester(new CrawlConfiguration { UserAgentString = "aaa" });
-            _goodPageResult = await pageRequster.MakeRequestAsync(new Uri("http://localhost:1111/"));
-            _badPageResult = await pageRequster.MakeRequestAsync(new Uri("http://localhost:1111/HttpResponse/Status404"));
+            _goodPageResult = await pageRequster.MakeRequestAsync(new Uri(unitTestConfig.SiteSimulatorBaseAddress));
+            _badPageResult = await pageRequster.MakeRequestAsync(new Uri(string.Concat(unitTestConfig.SiteSimulatorBaseAddress, "/HttpResponse/Status404")));
         }
 
         [SetUp]

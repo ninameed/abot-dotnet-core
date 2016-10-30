@@ -1,4 +1,5 @@
 ﻿using Abot.Poco;
+using Abot.Tests.Unit.Helpers;
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
@@ -63,7 +64,8 @@ namespace Abot.Tests.Unit.Poco
         [Test]
         public void ToString_MessageHasUri()
         {
-            Assert.AreEqual("http://localhost:1111/", new PageToCrawl(new Uri("http://localhost:1111/")).ToString());
+            UnitTestConfig unitTestConfig = new UnitTestConfig();
+            Assert.AreEqual(unitTestConfig.SiteSimulatorBaseAddress, new PageToCrawl(new Uri(unitTestConfig.SiteSimulatorBaseAddress)).ToString());
         }
     }
 }

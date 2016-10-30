@@ -1,5 +1,6 @@
 ﻿using Abot.Core;
 using Abot.Poco;
+using Abot.Tests.Unit.Helpers;
 using Commoner.Core.Testing;
 using NUnit.Framework;
 using System;
@@ -23,7 +24,8 @@ namespace Abot.Tests.Unit.Core
         [SetUp]
         public async Task Setup()
         {
-            _crawledPage = await new PageRequester(new CrawlConfiguration()).MakeRequestAsync(new Uri("http://localhost:1111/"));
+            UnitTestConfig unitTestConfig = new UnitTestConfig();
+            _crawledPage = await new PageRequester(new CrawlConfiguration()).MakeRequestAsync(new Uri(unitTestConfig.SiteSimulatorBaseAddress));
 
             //Make the real request above look like it came from the fake uri
             _crawledPage.ParentUri = _uri;

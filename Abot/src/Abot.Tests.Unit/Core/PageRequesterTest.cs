@@ -3,6 +3,7 @@ using Abot.Core;
 using Abot.Poco;
 using NUnit.Framework;
 using System.Threading.Tasks;
+using Abot.Tests.Unit.Helpers;
 
 namespace Abot.Tests.Unit.Core
 {
@@ -10,14 +11,15 @@ namespace Abot.Tests.Unit.Core
     public class PageRequesterTest
     {
         PageRequester _unitUnderTest;
-        Uri _validUri = new Uri("http://localhost:1111/");
-        Uri _403ErrorUri = new Uri("http://localhost:1111/HttpResponse/Status403");
-        Uri _404ErrorUri = new Uri("http://localhost:1111/HttpResponse/Status404");
-        Uri _500ErrorUri = new Uri("http://localhost:1111/HttpResponse/Status500");
-        Uri _502ErrorUri = new Uri("http://www.lakkjfkasdfjhqlkfj.com");//non resolvable
-        Uri _503ErrorUri = new Uri("http://localhost:1111/HttpResponse/Status503");
-        Uri _301To200Uri = new Uri("http://localhost:1111/HttpResponse/Redirect/?redirectHttpStatus=301&destinationHttpStatus=200");
-        Uri _301To404Uri = new Uri("http://localhost:1111/HttpResponse/Redirect/?redirectHttpStatus=301&destinationHttpStatus=404");
+        UnitTestConfig unitTestConfig = new UnitTestConfig();
+        Uri _validUri { get { return new Uri(unitTestConfig.SiteSimulatorBaseAddress); } }
+        Uri _403ErrorUri { get { return new Uri(string.Concat(unitTestConfig.SiteSimulatorBaseAddress, "/HttpResponse/Status403")); } }
+        Uri _404ErrorUri { get { return new Uri(string.Concat(unitTestConfig.SiteSimulatorBaseAddress, "/HttpResponse/Status404")); } }
+        Uri _500ErrorUri { get { return new Uri(string.Concat(unitTestConfig.SiteSimulatorBaseAddress, "/HttpResponse/Status500")); } }
+        Uri _503ErrorUri { get { return new Uri(string.Concat(unitTestConfig.SiteSimulatorBaseAddress, "/HttpResponse/Status503")); } }
+        Uri _301To200Uri { get { return new Uri(string.Concat(unitTestConfig.SiteSimulatorBaseAddress, "/HttpResponse/Redirect/?redirectHttpStatus=301&destinationHttpStatus=200")); } }
+        Uri _301To404Uri { get { return new Uri(string.Concat(unitTestConfig.SiteSimulatorBaseAddress, "/HttpResponse/Redirect/?redirectHttpStatus=301&destinationHttpStatus=404")); } }
+        Uri _502ErrorUri { get { return new Uri("http://www.lakkjfkasdfjhqlkfj.com"); } }//non resolvable
 
         CrawlConfiguration _crawlConfig = new CrawlConfiguration { UserAgentString = "someuseragentstringhere" };
 

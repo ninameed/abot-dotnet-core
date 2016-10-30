@@ -1,5 +1,6 @@
 ﻿using Abot.Core;
 using Abot.Poco;
+using Abot.Tests.Unit.Helpers;
 using NUnit.Framework;
 using System;
 using System.IO;
@@ -9,6 +10,8 @@ namespace Abot.Tests.Unit.Poco
     [TestFixture]
     public class CrawledPageTest
     {
+        UnitTestConfig unitTestConfig = new UnitTestConfig();
+
         [Test]
         public void Constructor_ValidUri_CreatesInstance()
         {
@@ -159,13 +162,14 @@ namespace Abot.Tests.Unit.Poco
         [Test]
         public void ToString_HttpResponseDoesNotExists_MessageHasUri()
         {
-            Assert.AreEqual("http://localhost:1111/", new CrawledPage(new Uri("http://localhost:1111/")).ToString());
+
+            Assert.AreEqual(unitTestConfig.SiteSimulatorBaseAddress, new CrawledPage(new Uri(unitTestConfig.SiteSimulatorBaseAddress)).ToString());
         }
 
         [Test]
         public void ToString_HttpResponseExists_MessageHasUriAndStatus()
         {
-            Assert.AreEqual("http://localhost:1111/[200]", new PageRequester(new CrawlConfiguration{ UserAgentString = "aaa" }).MakeRequestAsync(new Uri("http://localhost:1111/")).Result.ToString());
+            Assert.AreEqual(string.Concat(unitTestConfig.SiteSimulatorBaseAddress, "[200]"), new PageRequester(new CrawlConfiguration { UserAgentString = "aaa" }).MakeRequestAsync(new Uri("http://localhost:1111/")).Result.ToString());
         }
 
         [Test]
