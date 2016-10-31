@@ -71,7 +71,7 @@ namespace Abot.Core
             HttpResponseMessage httpResponseMessage = null;
             try
             {
-                request = BuildRequestObject(_httpClient, uri);
+                request = BuildRequestObject(uri);
                 crawledPage.RequestStarted = DateTime.Now;
                 httpResponseMessage = await _httpClient.SendAsync(request);
             }
@@ -118,7 +118,7 @@ namespace Abot.Core
             return crawledPage;
         }
 
-        private HttpRequestMessage BuildRequestObject(HttpClient c, Uri uri)
+        private HttpRequestMessage BuildRequestObject(Uri uri)
         {
             HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, uri);
             request.Headers.UserAgent.ParseAdd(_config.UserAgentString);
@@ -126,9 +126,6 @@ namespace Abot.Core
 
             if (_config.IsHttpRequestAutomaticDecompressionEnabled)
                 request.Headers.AcceptEncoding.ParseAdd("gzip, deflate");
-
-            if (_config.HttpRequestTimeoutInSeconds > 0)
-                c.Timeout = TimeSpan.FromSeconds(_config.HttpRequestTimeoutInSeconds);
 
             if (_config.IsAlwaysLogin)
             {
@@ -203,7 +200,7 @@ namespace Abot.Core
             var httpClient = new HttpClient(httpHandler);
             httpClient.DefaultRequestHeaders.TryAddWithoutValidation("Accept", "*/*");
             httpClient.DefaultRequestHeaders.TryAddWithoutValidation("User-Agent", _config.UserAgentString);
-            
+
             if (_config.HttpRequestTimeoutInSeconds > 0)
                 httpClient.Timeout = TimeSpan.FromSeconds(_config.HttpRequestTimeoutInSeconds);
 

@@ -649,7 +649,6 @@ namespace Abot.Crawler
             _crawlContext.IsCrawlHardStopRequested = true;
         }
 
-        //protected virtual async Task ProcessPage(PageToCrawl pageToCrawl)
         protected virtual async Task ProcessPageAsync(PageToCrawl pageToCrawl)
         {
             try
@@ -661,7 +660,6 @@ namespace Abot.Crawler
 
                 AddPageToContext(pageToCrawl);
 
-                //CrawledPage crawledPage = await CrawlThePage(pageToCrawl);
                 CrawledPage crawledPage = await CrawlThePageAsync(pageToCrawl);
 
                 // Validate the root uri in case of a redirection.
@@ -863,7 +861,6 @@ namespace Abot.Crawler
             return shouldRecrawlPageDecision.Allow;
         }
 
-        //protected virtual async Task<CrawledPage> CrawlThePage(PageToCrawl pageToCrawl)
         protected virtual async Task<CrawledPage> CrawlThePageAsync(PageToCrawl pageToCrawl)
         {
             _logger.LogDebug($"About to crawl page [{pageToCrawl.Uri.AbsoluteUri}]");
@@ -878,7 +875,6 @@ namespace Abot.Crawler
             pageToCrawl.LastRequest = DateTime.Now;
 
             var crawledPage = await _pageRequester.MakeRequestAsync(pageToCrawl.Uri, ShouldDownloadPageContent);
-            //CrawledPage crawledPage = await _pageRequester.MakeRequestAsync(pageToCrawl.Uri, ShouldDownloadPageContent);
 
             dynamic combinedPageBag = this.CombinePageBags(pageToCrawl.PageBag, crawledPage.PageBag);
             Mapper.Initialize(cfg =>
