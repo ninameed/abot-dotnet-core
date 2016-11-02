@@ -10,8 +10,8 @@ init:
 before_build:
 - appveyor-retry dotnet restore -v Minimal
 build_script:
-- dotnet build "Abot" -c %CONFIGURATION% --no-dependencies --version-suffix %LABEL%
-- dotnet build "Abot.Tests.Integration" -c %CONFIGURATION% --no-dependencies --version-suffix %LABEL%
-- dotnet build "Abot.Tests.Unit" -c %CONFIGURATION% --no-dependencies --version-suffix %LABEL%
+- dotnet build "Abot/src/Abot" -c %CONFIGURATION% --no-dependencies --version-suffix %LABEL%
+- dotnet build "Abot/src/Abot.Tests.Integration" -c %CONFIGURATION% --no-dependencies --version-suffix %LABEL%
+- dotnet build "Abot/src/Abot.Tests.Unit" -c %CONFIGURATION% --no-dependencies --version-suffix %LABEL%
 test_script:
-- dotnet test "Abot.Tests.Unit" -c %CONFIGURATION%
+- dotnet test "Abot/src/Abot.Tests.Unit" -c %CONFIGURATION%
