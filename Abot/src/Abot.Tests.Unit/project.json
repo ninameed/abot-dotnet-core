@@ -4,6 +4,7 @@
   "authors": [ "Steven Jones", "Kemy" ],
   "copyright": "Copyright 2012 SHARPDEV LLC",
   "description": ".NET Core port of sjdirect/abot. Abot is an open source C# web crawler built for speed and flexibility. It takes care of the low level plumbing (multithreading, http requests, scheduling, link parsing, etc..). You just register for events to process the page data. You can also plugin your own implementations of core interfaces to take complete control over the crawl process.",
+  "testRunner": "nunit",
 
   "dependencies": {
     "AutoMapper": "5.1.1",
@@ -18,7 +19,8 @@
     "NLog.Schema": "4.3.9",
     "NUnit": "3.4.1",
     "Commoner": "1.0.12",
-    "Moq": "4.6.38-alpha"
+    "Moq": "4.6.38-alpha",
+    "dotnet-test-nunit": "3.4.0-beta-3"
   },
   "frameworks": {
     "net46": {
