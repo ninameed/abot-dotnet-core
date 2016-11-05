@@ -15,7 +15,8 @@ build_script:
 - dotnet build "Abot/src/Abot.Tests.Integration" -c %CONFIGURATION% --no-dependencies --version-suffix %LABEL%
 - dotnet build "Abot/src/Abot.Tests.Unit" -c %CONFIGURATION% --no-dependencies --version-suffix %LABEL%
 before_test:
-- dotnet run -f %FRAMEWORK% -c %CONFIGURATION% -p "Abot/src/Abot.SiteSimulator"
+- cd ./Abot/src/Abot.SiteSimulator
+- dotnet run -f %FRAMEWORK% -c %CONFIGURATION%
 test_script:
 - dotnet test "Abot/src/Abot.Tests.Unit" -c %CONFIGURATION%
 - dotnet test "Abot/src/Abot.Tests.Integration" -c %CONFIGURATION%
