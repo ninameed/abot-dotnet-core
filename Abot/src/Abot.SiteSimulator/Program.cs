@@ -14,10 +14,11 @@ namespace Abot.SiteSimulator
         public static void Main(string[] args)
         {
             var host = new WebHostBuilder()
+                .UseUrls("http://0.0.0.0:1111")
                 .UseKestrel()
                 .UseContentRoot(Directory.GetCurrentDirectory())
                 .UseStartup<Startup>()
-                .UseUrls("http://0.0.0.0:1111")
+                .UseIISIntegration()
                 .Build();
             
 
