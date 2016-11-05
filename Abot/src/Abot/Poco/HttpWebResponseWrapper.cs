@@ -35,7 +35,7 @@ namespace Abot.Poco
                 return;
 
             StatusCode = response.StatusCode;
-            ContentType = response.Content.Headers.ContentType.ToString();
+            ContentType = response.Content.Headers.ContentType?.ToString();
             ContentLength = response.Content.Headers.ContentLength.Value;
             Headers = response.Headers.ToList();
             //CharacterSet = response.CharacterSet;

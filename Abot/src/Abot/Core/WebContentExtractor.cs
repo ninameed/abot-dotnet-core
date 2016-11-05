@@ -56,7 +56,7 @@ namespace Abot.Core
 
         protected virtual string GetCharsetFromHeaders(HttpResponseMessage httpResponseMessage)
         {
-            return httpResponseMessage.Content.Headers.ContentType.CharSet;
+            return httpResponseMessage.Content.Headers.ContentType?.CharSet;
         }
 
         protected virtual string GetCharsetFromBody(string body)
