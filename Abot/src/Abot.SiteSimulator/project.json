@@ -1,0 +1,42 @@
+{
+  "version": "1.0.0-*",
+
+  "dependencies": {
+    "AngleSharp": "0.9.9",
+    "HtmlAgilityPack.NetCore": "1.5.0.1",
+    "Microsoft.Extensions.Logging": "1.0.0",
+    "NETStandard.Library": "1.6.0",
+    "System.Collections.Specialized": "4.0.1",
+    "System.Net.Http": "4.1.0",
+    "NRobotsCore": "1.1.2",
+    "AutoMapper": "5.1.1",
+    "System.Reflection.TypeExtensions": "4.1.0",
+    "System.Threading.ThreadPool": "4.0.10",
+    "System.Threading.Thread": "4.0.0",
+    "Microsoft.NETCore.App": "1.0.1",
+    "Microsoft.Extensions.Configuration.Abstractions": "1.0.0",
+    "Microsoft.Extensions.Configuration": "1.0.0",
+    "Microsoft.Extensions.Configuration.Json": "1.0.0",
+    "Microsoft.AspNetCore.Mvc.ViewFeatures": "1.0.1",
+    "Microsoft.AspNetCore.Hosting": "1.0.0",
+    "Microsoft.AspNetCore.Server.Kestrel": "1.0.1",
+    "Microsoft.Extensions.Logging.Console": "1.0.0",
+    "Microsoft.Extensions.Logging.Debug": "1.0.0",
+    "Microsoft.AspNetCore.StaticFiles": "1.0.0",
+    "Microsoft.AspNetCore.Mvc": "1.0.1"
+  },
+
+  "buildOptions": {
+    "preserveCompilationContext": true,
+    "emitEntryPoint": true
+  },
+
+  "frameworks": {
+    "netcoreapp1.0": {
+      "imports": "dnxcore50"
+    }
+  },
+  "runtimes": {
+    "win10-x64": {}
+  }
+}

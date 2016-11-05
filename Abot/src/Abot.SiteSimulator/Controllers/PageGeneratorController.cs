@@ -1,7 +1,7 @@
 ﻿using Abot.SiteSimulator.Models;
 using System;
 using System.Collections.Generic;
-using System.Web.Mvc;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Abot.SiteSimulator.Controllers
 {
@@ -27,12 +27,12 @@ namespace Abot.SiteSimulator.Controllers
             refreshCountsTime = DateTime.Now.AddSeconds(30);
         }
 
-        public ActionResult Index()
+        public IActionResult Index()
         {
             return View();
         }
 
-        public ActionResult Generate(PageSpecs pageSpecs)
+        public IActionResult Generate(PageSpecs pageSpecs)
         {
             if (pageSpecs == null)
                 throw new ArgumentNullException("pageSpecs");
@@ -83,7 +83,7 @@ namespace Abot.SiteSimulator.Controllers
             return View("GeneratedPage", finalSpecs);
         }
 
-        public ActionResult ClearCounters()
+        public IActionResult ClearCounters()
         {
             InitializeCounts();
 

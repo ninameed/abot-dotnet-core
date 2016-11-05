@@ -13,12 +13,12 @@ namespace Abot.Tests.Unit.Core
         PageRequester _unitUnderTest;
         UnitTestConfig unitTestConfig = new UnitTestConfig();
         Uri _validUri { get { return new Uri(unitTestConfig.SiteSimulatorBaseAddress); } }
-        Uri _403ErrorUri { get { return new Uri(string.Concat(unitTestConfig.SiteSimulatorBaseAddress, "/HttpResponse/Status403")); } }
-        Uri _404ErrorUri { get { return new Uri(string.Concat(unitTestConfig.SiteSimulatorBaseAddress, "/HttpResponse/Status404")); } }
-        Uri _500ErrorUri { get { return new Uri(string.Concat(unitTestConfig.SiteSimulatorBaseAddress, "/HttpResponse/Status500")); } }
-        Uri _503ErrorUri { get { return new Uri(string.Concat(unitTestConfig.SiteSimulatorBaseAddress, "/HttpResponse/Status503")); } }
-        Uri _301To200Uri { get { return new Uri(string.Concat(unitTestConfig.SiteSimulatorBaseAddress, "/HttpResponse/Redirect/?redirectHttpStatus=301&destinationHttpStatus=200")); } }
-        Uri _301To404Uri { get { return new Uri(string.Concat(unitTestConfig.SiteSimulatorBaseAddress, "/HttpResponse/Redirect/?redirectHttpStatus=301&destinationHttpStatus=404")); } }
+        Uri _403ErrorUri { get { return new Uri(string.Concat(unitTestConfig.SiteSimulatorBaseAddress, "HttpResponse/Status403")); } }
+        Uri _404ErrorUri { get { return new Uri(string.Concat(unitTestConfig.SiteSimulatorBaseAddress, "HttpResponse/Status404")); } }
+        Uri _500ErrorUri { get { return new Uri(string.Concat(unitTestConfig.SiteSimulatorBaseAddress, "HttpResponse/Status500")); } }
+        Uri _503ErrorUri { get { return new Uri(string.Concat(unitTestConfig.SiteSimulatorBaseAddress, "HttpResponse/Status503")); } }
+        Uri _301To200Uri { get { return new Uri(string.Concat(unitTestConfig.SiteSimulatorBaseAddress, "HttpResponse/Redirect/?redirectHttpStatus=301&destinationHttpStatus=200")); } }
+        Uri _301To404Uri { get { return new Uri(string.Concat(unitTestConfig.SiteSimulatorBaseAddress, "HttpResponse/Redirect/?redirectHttpStatus=301&destinationHttpStatus=404")); } }
         Uri _502ErrorUri { get { return new Uri("http://www.lakkjfkasdfjhqlkfj.com"); } }//non resolvable
 
         CrawlConfiguration _crawlConfig = new CrawlConfiguration { UserAgentString = "someuseragentstringhere" };
@@ -67,14 +67,8 @@ namespace Abot.Tests.Unit.Core
             CrawledPage result = await _unitUnderTest.MakeRequestAsync(_403ErrorUri);
 
             Assert.IsNotNull(result);
-            Assert.IsNotNull(result.HttpRequestMessage);
             Assert.IsNotNull(result.HttpWebResponse);
-            Assert.IsNotNull(result.HttpRequestException);
-            Assert.IsFalse(string.IsNullOrWhiteSpace(result.Content.Text));
-            Assert.IsNotNull(result.HtmlDocument);
-            Assert.IsNotNull(result.AngleSharpHtmlDocument);
             Assert.AreEqual(403, (int)result.HttpWebResponse.StatusCode);
-            Assert.IsTrue(result.Content.Bytes.Length > 0);
         }
 
         [Test]
@@ -86,11 +80,11 @@ namespace Abot.Tests.Unit.Core
             Assert.IsNotNull(result.HttpRequestMessage);
             Assert.IsNotNull(result.HttpWebResponse);
             Assert.IsNotNull(result.HttpRequestException);
-            Assert.IsFalse(string.IsNullOrWhiteSpace(result.Content.Text));
+            Assert.IsTrue(string.IsNullOrWhiteSpace(result.Content.Text));
             Assert.IsNotNull(result.HtmlDocument);
             Assert.IsNotNull(result.AngleSharpHtmlDocument);
             Assert.AreEqual(404, (int)result.HttpWebResponse.StatusCode);
-            Assert.IsTrue(result.Content.Bytes.Length > 0);
+            Assert.IsTrue(result.Content.Bytes.Length == 0);
         }
 
         [Test]
@@ -102,10 +96,10 @@ namespace Abot.Tests.Unit.Core
             Assert.IsNotNull(result.HttpRequestMessage);
             Assert.IsNotNull(result.HttpWebResponse);
             Assert.IsNotNull(result.HttpRequestException);
-            Assert.IsFalse(string.IsNullOrWhiteSpace(result.Content.Text));
+            Assert.IsTrue(string.IsNullOrWhiteSpace(result.Content.Text));
             Assert.IsNotNull(result.HtmlDocument);
             Assert.AreEqual(500, (int)result.HttpWebResponse.StatusCode);
-            Assert.IsTrue(result.Content.Bytes.Length > 0);
+            Assert.IsTrue(result.Content.Bytes.Length == 0);
         }
 
         [Test]
@@ -117,11 +111,11 @@ namespace Abot.Tests.Unit.Core
             Assert.IsNotNull(result.HttpRequestMessage);
             Assert.IsNotNull(result.HttpWebResponse);
             Assert.IsNotNull(result.HttpRequestException);
-            Assert.IsFalse(string.IsNullOrWhiteSpace(result.Content.Text));
+            Assert.IsTrue(string.IsNullOrWhiteSpace(result.Content.Text));
             Assert.IsNotNull(result.HtmlDocument);
             Assert.IsNotNull(result.AngleSharpHtmlDocument);
             Assert.AreEqual(503, (int)result.HttpWebResponse.StatusCode);
-            Assert.IsTrue(result.Content.Bytes.Length > 0);
+            Assert.IsTrue(result.Content.Bytes.Length == 0);
 
         }
 
@@ -170,11 +164,11 @@ namespace Abot.Tests.Unit.Core
             Assert.IsNotNull(result.HttpRequestMessage);
             Assert.IsNotNull(result.HttpWebResponse);
             Assert.IsNotNull(result.HttpRequestException);
-            Assert.IsFalse(string.IsNullOrWhiteSpace(result.Content.Text));
+            Assert.IsTrue(string.IsNullOrWhiteSpace(result.Content.Text));
             Assert.IsNotNull(result.HtmlDocument);
             Assert.IsNotNull(result.AngleSharpHtmlDocument);
             Assert.AreEqual(404, (int)result.HttpWebResponse.StatusCode);
-            Assert.IsTrue(result.Content.Bytes.Length > 0);
+            Assert.IsTrue(result.Content.Bytes.Length == 0);
         }
 
         [Test]

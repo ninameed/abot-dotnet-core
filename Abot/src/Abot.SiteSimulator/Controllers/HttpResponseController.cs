@@ -1,19 +1,17 @@
 ﻿using System;
 using System.Net;
 using System.Threading;
-using System.Web;
-using System.Web.Mvc;
-
+using Microsoft.AspNetCore.Mvc;
 namespace Abot.SiteSimulator.Controllers
 {
     public class HttpResponseController : Controller
     {
-        public ActionResult Index()
+        public IActionResult Index()
         {
             return Status200();
         }
 
-        public ActionResult Status200()
+        public IActionResult Status200()
         {
             Thread.Sleep(100);
             ViewBag.Header = "Status 200";
@@ -21,30 +19,30 @@ namespace Abot.SiteSimulator.Controllers
             return View("BlankPage");
         }
 
-        public ActionResult Status403()
+        public IActionResult Status403()
         {
             Thread.Sleep(200);
-            throw new HttpException(Convert.ToInt32(HttpStatusCode.Forbidden), "");
+            return StatusCode(403);
         }
 
-        public ActionResult Status404()
+        public IActionResult Status404()
         {
             Thread.Sleep(300);
-            throw new HttpException(Convert.ToInt32(HttpStatusCode.NotFound), "");
+            return NotFound();
         }
 
-        public ActionResult Status500()
+        public IActionResult Status500()
         {
             Thread.Sleep(400);
-            throw new HttpException(Convert.ToInt32(HttpStatusCode.InternalServerError), "");
+            return StatusCode(500);
         }
 
-        public ActionResult Status503()
+        public IActionResult Status503()
         {
-            throw new HttpException(Convert.ToInt32(HttpStatusCode.ServiceUnavailable), "");
+            return StatusCode(503);
         }
 
-        public ActionResult Redirect(int redirectHttpStatus, int destinationHttpStatus)
+        public IActionResult Redirect(int redirectHttpStatus, int destinationHttpStatus)
         {
             if(!IsValidRedirectStatus(redirectHttpStatus))
                 throw new ArgumentException("redirectHttpStatus is invalid");

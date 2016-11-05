@@ -668,7 +668,7 @@ namespace Abot.Tests.Unit.Core
         [Test]
         public async Task ShouldDownloadPageContent_NonHtmlPage_ReturnsFalse()
         {
-            Uri imageUrl = new Uri(string.Concat(unitTestConfig.SiteSimulatorBaseAddress, "/Content/themes/base/images/ui-bg_flat_0_aaaaaa_40x100.png"));
+            Uri imageUrl = new Uri(string.Concat(unitTestConfig.SiteSimulatorBaseAddress, "themes/base/images/ui-bg_flat_0_aaaaaa_40x100.png"));
 
             CrawlDecision result = _unitUnderTest.ShouldDownloadPageContent(await new PageRequester(_crawlContext.CrawlConfiguration).MakeRequestAsync(imageUrl), _crawlContext);
 
@@ -681,7 +681,7 @@ namespace Abot.Tests.Unit.Core
         [Test]
         public async Task ShouldDownloadPageContent_NonHtmlPage_DownloadableContentTypesWithSpaces_ReturnsFalse()
         {
-            Uri imageUrl = new Uri(string.Concat(unitTestConfig.SiteSimulatorBaseAddress, "/Content/themes/base/images/ui-bg_flat_0_aaaaaa_40x100.png"));//Content type fo this link is image/png
+            Uri imageUrl = new Uri(string.Concat(unitTestConfig.SiteSimulatorBaseAddress, "themes/base/images/ui-bg_flat_0_aaaaaa_40x100.png"));//Content type fo this link is image/png
 
             _crawlContext.CrawlConfiguration.DownloadableContentTypes = "text/hmtl, ,    , application/pdf";
             CrawlDecision result = _unitUnderTest.ShouldDownloadPageContent(await new PageRequester(_crawlContext.CrawlConfiguration).MakeRequestAsync(imageUrl), _crawlContext);

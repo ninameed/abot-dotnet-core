@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Web.Mvc;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Abot.SiteSimulator.Controllers
 {
@@ -7,12 +7,12 @@ namespace Abot.SiteSimulator.Controllers
     {
         static DateTime? _lastServedDate = null;
 
-        public ActionResult Index()
+        public IActionResult Index()
         {
             return View("Index");
         }
 
-        public ActionResult Handle1RequestEveryXSeconds(int seconds)
+        public IActionResult Handle1RequestEveryXSeconds(int seconds)
         {
             DateTime lastServedDate = _lastServedDate.HasValue ? _lastServedDate.Value : default(DateTime);
             double milliSinceLastRequest = (DateTime.Now - lastServedDate).TotalMilliseconds;
@@ -26,7 +26,7 @@ namespace Abot.SiteSimulator.Controllers
             return new HttpResponseController().Status503();
         }
 
-        public ActionResult ResetLastServcedDate()
+        public IActionResult ResetLastServcedDate()
         {
             _lastServedDate = default(DateTime);
 
