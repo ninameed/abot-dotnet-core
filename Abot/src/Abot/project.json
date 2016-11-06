@@ -1,5 +1,8 @@
 {
-  "version": "1.0.0-*",
+  "name": "AbotCore",
+  "version": "0.1.10-alpha1",
+  "copyright": "Copyright 2012 SHARPDEV LLC",
+  "description": ".NET Core port of sjdirect/abot. Abot is an open source C# web crawler built for speed and flexibility. It takes care of the low level plumbing (multithreading, http requests, scheduling, link parsing, etc..). You just register for events to process the page data. You can also plugin your own implementations of core interfaces to take complete control over the crawl process.",
 
   "dependencies": {
     "AngleSharp": "0.9.9",
@@ -27,5 +30,13 @@
         "Microsoft.Net.Http": "2.2.22"
       }
     }
+  },
+  "packOptions": {
+    "owners": [ "Steven Jones", "Kemy" ],
+    "requireLicenseAcceptance": false,
+    "tags": [ "crawler", "robot", "spider" ],
+    "summary": "Open source C# web crawler built for speed, flexibility and extensibility.",
+    "licenseUrl": "http://www.apache.org/licenses/LICENSE-2.0",
+    "projectUrl": "https://github.com/sjdirect/abot-dotnet-core"
   }
 }
