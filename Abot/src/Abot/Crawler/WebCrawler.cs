@@ -230,7 +230,7 @@ namespace Abot.Crawler
 
             if (_crawlContext.CrawlConfiguration.CrawlTimeoutSeconds > 0)
             {
-                _timeoutTimer = new Timer(HandleCrawlTimeout, null, _crawlContext.CrawlConfiguration.CrawlTimeoutSeconds, _crawlContext.CrawlConfiguration.CrawlTimeoutSeconds * 1000);
+                _timeoutTimer = new Timer(HandleCrawlTimeout, null, _crawlContext.CrawlConfiguration.CrawlTimeoutSeconds * 1000, -1);
             }
 
             try
