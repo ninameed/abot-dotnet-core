@@ -18,7 +18,8 @@
     "Microsoft.Extensions.Configuration": "1.0.0",
     "Microsoft.Extensions.Configuration.Json": "1.0.0",
     "system.net.http.winhttphandler": "4.0.0",
-    "System.Net.Primitives": "4.0.10"
+    "System.Net.Primitives": "4.0.10",
+    "dotnet-test-nunit": "3.4.0-beta-3"
   },
   "frameworks": {
     "net46": {
