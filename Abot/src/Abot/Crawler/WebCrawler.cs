@@ -516,13 +516,24 @@ namespace Abot.Crawler
 
         protected virtual async Task CrawlSite()
         {
-            while (!_crawlComplete)
+            bool cancelled = false;
+            while (!_crawlComplete && !cancelled)
             {
                 RunPreWorkChecks();
 
                 if (_scheduler.Count > 0)
                 {
-                    _threadManager.DoWork(async() => await ProcessPageAsync(_scheduler.GetNext()));
+                    _threadManager.DoWork(async () =>
+                    {
+                        try
+                        {
+                            await ProcessPageAsync(_scheduler.GetNext());
+                        }
+                        catch(OperationCanceledException)
+                        {
+                            cancelled = true;
+                        }
+                    });
                 }
                 else if (!_threadManager.HasRunningThreads())
                 {
