@@ -389,7 +389,7 @@ namespace Abot.Crawler
                 //Fire each subscribers delegate async
                 foreach (EventHandler<PageCrawlStartingArgs> del in threadSafeEvent.GetInvocationList())
                 {
-                    del.BeginInvoke(this, new PageCrawlStartingArgs(_crawlContext, pageToCrawl), null, null);
+                    Task.Run(() => { del.Invoke(this, new PageCrawlStartingArgs(_crawlContext, pageToCrawl)); });
                 }
             }
         }
@@ -418,7 +418,7 @@ namespace Abot.Crawler
                 //Fire each subscribers delegate async
                 foreach (EventHandler<PageCrawlCompletedArgs> del in threadSafeEvent.GetInvocationList())
                 {
-                    del.BeginInvoke(this, new PageCrawlCompletedArgs(_crawlContext, crawledPage), null, null);
+                    Task.Run(() => { del(this, new PageCrawlCompletedArgs(_crawlContext, crawledPage)); });
                 }
             }
         }
@@ -431,7 +431,7 @@ namespace Abot.Crawler
                 //Fire each subscribers delegate async
                 foreach (EventHandler<PageCrawlDisallowedArgs> del in threadSafeEvent.GetInvocationList())
                 {
-                    del.BeginInvoke(this, new PageCrawlDisallowedArgs(_crawlContext, pageToCrawl, reason), null, null);
+                    Task.Run(() => { del(this, new PageCrawlDisallowedArgs(_crawlContext, pageToCrawl, reason)); });
                 }
             }
         }
@@ -444,7 +444,7 @@ namespace Abot.Crawler
                 //Fire each subscribers delegate async
                 foreach (EventHandler<PageLinksCrawlDisallowedArgs> del in threadSafeEvent.GetInvocationList())
                 {
-                    del.BeginInvoke(this, new PageLinksCrawlDisallowedArgs(_crawlContext, crawledPage, reason), null, null);
+                    Task.Run(() => { del(this, new PageLinksCrawlDisallowedArgs(_crawlContext, crawledPage, reason)); });
                 }
             }
         }

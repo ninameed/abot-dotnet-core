@@ -170,7 +170,7 @@ namespace Abot.Crawler
             foreach (var @delegate in threadSafeEvent.GetInvocationList())
             {
                 var del = (EventHandler<RobotsDotTextParseCompletedArgs>) @delegate;
-                del.BeginInvoke(this, new RobotsDotTextParseCompletedArgs(_crawlContext, robots), null, null);
+                Task.Run(() => { del(this, new RobotsDotTextParseCompletedArgs(_crawlContext, robots)); });
             }
         }
 
