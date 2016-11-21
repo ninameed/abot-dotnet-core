@@ -15,7 +15,8 @@ namespace Abot.Tests.Integration
 		}
 
 		[Test]
-		public async Task Crawl_VerifyCrawlResultIsAsExpected ()
+        [Ignore("Should replace Fiddler")]
+        public async Task Crawl_VerifyCrawlResultIsAsExpected ()
 		{
 			await base.CrawlAndAssertAsync (new PoliteWebCrawler ());
 		}
