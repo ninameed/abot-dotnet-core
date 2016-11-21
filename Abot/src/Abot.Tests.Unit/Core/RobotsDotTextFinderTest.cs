@@ -16,7 +16,7 @@ namespace Abot.Tests.Unit.Core
         CrawledPage _goodPageResult;
         CrawledPage _badPageResult;
 
-        [TestFixtureSetUp]
+        [OneTimeSetUp]
         public async Task TestFixtureSetup()
         {
             UnitTestConfig unitTestConfig = new UnitTestConfig();
