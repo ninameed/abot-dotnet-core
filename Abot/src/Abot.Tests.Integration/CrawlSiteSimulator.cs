@@ -108,7 +108,7 @@ namespace Abot.Tests.Integration
         }
 
         [Test]
-        public async Task Crawl_Synchronous_CancellationTokenCancelled_StopsCrawl()
+        public async Task Crawl_CancellationTokenCancelled_StopsCrawl()
         {
             CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
             System.Timers.Timer timer = new System.Timers.Timer(800);
@@ -122,27 +122,6 @@ namespace Abot.Tests.Integration
 
             PoliteWebCrawler crawler = new PoliteWebCrawler();
             CrawlResult result = await crawler.CrawlAsync(new Uri("http://localhost:1111/"), cancellationTokenSource);
-
-            Assert.IsTrue(result.ErrorOccurred);
-            Assert.IsTrue(result.ErrorException is OperationCanceledException);
-        }
-
-        [Test]
-        public void Crawl_Asynchronous_CancellationTokenCancelled_StopsCrawl()
-        {
-            CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
-            System.Timers.Timer timer = new System.Timers.Timer(800);
-            timer.Elapsed += (o, e) =>
-            {
-                cancellationTokenSource.Cancel();
-                timer.Stop();
-                timer.Dispose();
-            };
-            timer.Start();
-
-            PoliteWebCrawler crawler = new PoliteWebCrawler();
-            Task<CrawlResult> task = Task.Factory.StartNew<CrawlResult>(() => crawler.CrawlAsync(new Uri("http://localhost:1111/"), cancellationTokenSource).GetAwaiter().GetResult());
-            CrawlResult result = task.Result;
 
             Assert.IsTrue(result.ErrorOccurred);
             Assert.IsTrue(result.ErrorException is OperationCanceledException);
