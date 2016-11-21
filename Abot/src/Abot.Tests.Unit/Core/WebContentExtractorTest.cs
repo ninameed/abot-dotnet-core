@@ -12,6 +12,7 @@ using System.Threading.Tasks;
 namespace Abot.Tests.Unit.Core
 {
     [TestFixture]
+    [Ignore("Should replace Fiddler")]
     public class WebContentExtractorTest
     {
         WebContentExtractor _uut;
