@@ -1,22 +1,19 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.25420.1
+# Visual Studio 15
+VisualStudioVersion = 15.0.26730.16
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{1E22890F-2F96-41A0-8905-51956BCD9886}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{CB7C5BFB-FB4F-4934-9CB2-245FBFD237E2}"
-	ProjectSection(SolutionItems) = preProject
-		global.json = global.json
-	EndProjectSection
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Abot", "src\Abot\Abot.xproj", "{0AABB4C5-EFDD-48AD-AF9B-AC3634F5A9D0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Abot", "src\Abot\Abot.csproj", "{0AABB4C5-EFDD-48AD-AF9B-AC3634F5A9D0}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Abot.Tests.Unit", "src\Abot.Tests.Unit\Abot.Tests.Unit.xproj", "{83565211-88C8-4AB6-BEFA-FB214BAA7F87}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Abot.Tests.Unit", "src\Abot.Tests.Unit\Abot.Tests.Unit.csproj", "{83565211-88C8-4AB6-BEFA-FB214BAA7F87}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Abot.Tests.Integration", "src\Abot.Tests.Integration\Abot.Tests.Integration.xproj", "{5AF217E5-B7EF-4F2F-AEEB-CBF9707D3825}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Abot.Tests.Integration", "src\Abot.Tests.Integration\Abot.Tests.Integration.csproj", "{5AF217E5-B7EF-4F2F-AEEB-CBF9707D3825}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Abot.SiteSimulator", "src\Abot.SiteSimulator\Abot.SiteSimulator.xproj", "{82AE5A47-5E1B-4463-A594-1A7061A369A4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Abot.SiteSimulator", "src\Abot.SiteSimulator\Abot.SiteSimulator.csproj", "{82AE5A47-5E1B-4463-A594-1A7061A369A4}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -49,5 +46,8 @@ Global
 		{83565211-88C8-4AB6-BEFA-FB214BAA7F87} = {1E22890F-2F96-41A0-8905-51956BCD9886}
 		{5AF217E5-B7EF-4F2F-AEEB-CBF9707D3825} = {1E22890F-2F96-41A0-8905-51956BCD9886}
 		{82AE5A47-5E1B-4463-A594-1A7061A369A4} = {1E22890F-2F96-41A0-8905-51956BCD9886}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {A40C4C6C-16C2-4AC0-A2E2-12A0B464FA7F}
 	EndGlobalSection
 EndGlobal
