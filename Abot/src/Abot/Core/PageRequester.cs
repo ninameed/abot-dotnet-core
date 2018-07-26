@@ -161,11 +161,12 @@ namespace Abot.Core
             }
 
             //Supposedly this does not work... https://github.com/sjdirect/abot/issues/122
-            //if (_config.IsAlwaysLogin)
-            //{
-            //    handler.Credentials = new NetworkCredential(_config.LoginUser, _config.LoginPassword);
-            //    handler.UseDefaultCredentials = false;
-            //}
+            if (_config.IsAlwaysLogin || true)
+            {
+                //handler.Credentials = new NetworkCredential(_config.LoginUser, _config.LoginPassword);
+                //handler.UseDefaultCredentials = false;
+                handler.UseDefaultCredentials = true;
+            }
 
 #if NETSTANDARD1_6
 
@@ -204,11 +205,11 @@ namespace Abot.Core
             if (_config.HttpRequestTimeoutInSeconds > 0)
                 httpClient.Timeout = TimeSpan.FromSeconds(_config.HttpRequestTimeoutInSeconds);
 
-            if (_config.IsAlwaysLogin)
-            {
-                var credentials = Convert.ToBase64String(System.Text.Encoding.ASCII.GetBytes(_config.LoginUser + ":" + _config.LoginPassword));
-                httpClient.DefaultRequestHeaders.TryAddWithoutValidation("Authorization",  "Basic " + credentials);
-            }
+            //if (_config.IsAlwaysLogin)
+            //{
+            //    var credentials = Convert.ToBase64String(System.Text.Encoding.ASCII.GetBytes(_config.LoginUser + ":" + _config.LoginPassword));
+            //    httpClient.DefaultRequestHeaders.TryAddWithoutValidation("Authorization",  "Basic " + credentials);
+            //}
             return httpClient;
         }
 
